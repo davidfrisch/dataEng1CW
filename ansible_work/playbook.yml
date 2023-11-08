@@ -1,0 +1,6 @@
+- name: My first playbook
+  hosts: mymachines
+  become: true
+  become_user: root
+  roles:
+    - postgresql
