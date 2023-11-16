@@ -2,6 +2,7 @@ import sys
 from subprocess import Popen, PIPE
 from Bio import SeqIO
 
+
 """
 usage: python pipeline_script.py INPUT.fasta  
 approx 5min per analysis
@@ -21,7 +22,8 @@ def run_hhsearch(a3m_file):
     """
     Run HHSearch to produce the hhr file
     """
-    cmd = ['/home/dbuchan/Applications/hh-suite-3.3.0/build/bin/hhsearch',
+    hh_suite_bin_path = "~/hh-suite/bin/hhsearch"
+    cmd = [hh_suite_bin_path + '/hhsearch',
            '-i', a3m_file, '-cpu', '1', '-d', 
            '/home/dbuchan/Data/hhdb/pdb70/pdb70']
     print(f'STEP 3: RUNNING HHSEARCH: {" ".join(cmd)}')
@@ -52,6 +54,7 @@ def run_s4pred(input_file, out_file):
     """
     Runs the s4pred secondary structure predictor to produce the horiz file
     """
+    s4pref_folder_path
     cmd = ['/usr/bin/python3', '/home/dbuchan/Code/s4pred/run_model.py',
            '-t', 'horiz', '-T', '1', input_file]
     print(f'STEP 1: RUNNING S4PRED: {" ".join(cmd)}')
