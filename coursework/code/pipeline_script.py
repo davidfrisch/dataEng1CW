@@ -54,14 +54,26 @@ def run_s4pred(input_file, out_file):
     """
     Runs the s4pred secondary structure predictor to produce the horiz file
     """
-    s4pref_folder_path
-    cmd = ['/usr/bin/python3', '/home/dbuchan/Code/s4pred/run_model.py',
+    s4pref_folder_path = "/Users/david/development/ucl/programs/s4pred"
+    cmd = ['python3', s4pref_folder_path + '/run_model.py',
            '-t', 'horiz', '-T', '1', input_file]
     print(f'STEP 1: RUNNING S4PRED: {" ".join(cmd)}')
     p = Popen(cmd, stdin=PIPE,stdout=PIPE, stderr=PIPE)
-    out, err = p.communicate()
-    with open(out_file, "w") as fh_out:
+    try:
+      out, err = p.communicate()
+      
+      if err:
+        raise Exception(err)
+      
+      print(out.decode("utf-8"))
+      with open(out_file, "w") as fh_out:
         fh_out.write(out.decode("utf-8"))
+    
+    except Exception as err:
+      print("Error running s4pred")
+      print(err)
+      sys.exit(1)
+      
 
     
 def read_input(file):

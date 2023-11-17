@@ -1,0 +1,6 @@
+venv
+*.fas
+*.out
+*.hhr
+*.horiz
+*.a3m
