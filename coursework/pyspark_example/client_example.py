@@ -1,10 +1,12 @@
 from pyspark.sql import SparkSession
 from time import sleep
 
+# You can find more info in the notion link
+# https://www.notion.so/Install-Spark-20825f2589424505b14157a26abc17a8#2ff95e3fd69447fb849a394b0a7cd6dc
+
 def main():
     # Create a Spark session
-    # IP is 100.121.87.128
-    spark = SparkSession.builder.appName("ClusterExample").master("spark://" + "1
+    spark = SparkSession.builder.appName("ClusterExample").master("spark://ip-10-0-13-106.eu-west-2.compute.internal:7077").getOrCreate()
 
     # Parallelize a simple dataset
     data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
