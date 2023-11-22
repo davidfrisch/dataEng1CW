@@ -3,6 +3,7 @@ import numpy as np
 from scipy.stats import gmean
 import sys
 import os
+import argparse
 
 def run_hhr_parser(hhr_file, output_file):
     """
@@ -36,11 +37,17 @@ def run_hhr_parser(hhr_file, output_file):
 
 
 if __name__ == "__main__":
-  if len(sys.argv) != 3:
-    print("Usage: python results_parser.py <hhr_file> <output_file>")
-    sys.exit(1)
+  parser = argparse.ArgumentParser(
+                      prog='HHR Parser', 
+                      description='Parse HHR results and write to csv file',
+                      epilog='Example: python results_parser.py <hhr_file> <output_file>' )
+  parser.add_argument('-f', '--hhr_file', help='HHR file to parse')
+  parser.add_argument('-o', '--output_file', help='Output file to write results to')
+  args = parser.parse_args()
 
-  hhr_file = sys.argv[1]
-  output_file = sys.argv[2]
+  args = parser.parse_args()
+
+  hhr_file = args.hhr_file
+  output_file = args.output_file
   print(f"Running parser on {hhr_file}")
   run_hhr_parser(hhr_file, output_file)

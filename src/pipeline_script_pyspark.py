@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import sys
 from subprocess import Popen, PIPE
@@ -6,6 +7,7 @@ from pyspark.sql import SparkSession
 import boto3
 from botocore.exceptions import ClientError
 from time import time
+import argparse
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 """
@@ -21,7 +23,7 @@ def run_parser(hhr_file, output_file):
     """
     Run the results_parser.py over the hhr file to produce the output summary
     """
-    cmd = [PYTHON3_PATH, f'{ROOT_DIR}/results_parser.py', hhr_file, output_file]
+    cmd = [PYTHON3_PATH, f'{ROOT_DIR}/results_parser.py', '-f', hhr_file, '-o', output_file]
     print(f'STEP 4: RUNNING PARSER: {" ".join(cmd)}')
     p = Popen(cmd, stdin=PIPE,stdout=PIPE, stderr=PIPE)
     out, err = p.communicate()
@@ -170,18 +172,34 @@ if __name__ == "__main__":
     # unique random id for this run time + bucket name
     run_id = "run_" + str(int(time())) + "_pyspark"
     bucket = "comp0235-ucabfri"
-
-    if len(sys.argv) > 3:
-        print("Usage: python script.py input_file [--local]")
-        sys.exit(1)
-
-    # if --master is not specified, it will run locally
-    spark = None
-    if "--local" in sys.argv:
-        spark = SparkSession.builder.appName("pdb_analyse").master("local[*]").getOrCreate()
-    else:
-        spark = SparkSession.builder.appName("pdb_analyse").master("spark://ip-10-0-13-106.eu-west-2.compute.internal:7077").getOrCreate()
+    master_url = "spark://ip-10-0-13-106.eu-west-2.compute.internal:7077"
+    parser = argparse.ArgumentParser(
+        prog='PDB Analyse',
+        description='runs the data analysis pipeline to predict protein structure',
+        epilog='Example: python pipeline_script_pyspark.py -f <input_file> [options]' )
     
+    parser.add_argument('-f', '--input_file', help='Input file to run the pipeline on, must be in fasta format', required=True)
+    parser.add_argument('--local', help='Run the pipeline locally', action='store_true', default=False)
+    parser.add_argument('--master', help='Spark master url', default=master_url)
+    parser.add_argument('--bucket', help='S3 bucket name', default=bucket)
+    parser.add_argument('--run_id', help='Unique run id', default=run_id)
+
+    args = parser.parse_args()
+    
+    spark = None
+    if args.master:
+        master_url = args.master
+    if args.local:
+        print("RUNNING LOCALLY")
+        master_url = "local[*]"
+    if args.bucket:
+        bucket = args.bucket
+    if args.run_id:
+        run_id = args.run_id
+    
+    
+    spark = SparkSession.builder.appName("pdb_analyse").master(master_url).getOrCreate()
+    print("SPARK SESSION STARTED on ", master_url)
 
     if os.path.exists(f"{ROOT_DIR}/output/{run_id}"):
         os.system(f"rm -rf {ROOT_DIR}/output/{run_id}")
@@ -189,7 +207,7 @@ if __name__ == "__main__":
     os.makedirs(f"{ROOT_DIR}/output/{run_id}")
     
     print("START RUN ID: ", run_id)
-    sequences = read_input(sys.argv[1])
+    sequences = read_input(args.input_file)
 
     sequence_list = list(sequences.items())
 
