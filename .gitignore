@@ -9,3 +9,4 @@ data
 tmp
 *.csv
 __pycache__
+.env

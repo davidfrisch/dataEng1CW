@@ -1,7 +1,6 @@
 from Bio import SearchIO
 import numpy as np
 from scipy.stats import gmean
-import sys
 import os
 import argparse
 

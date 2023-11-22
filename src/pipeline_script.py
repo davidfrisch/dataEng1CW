@@ -8,17 +8,31 @@ import boto3
 from botocore.exceptions import ClientError
 from time import time
 import argparse
+from dotenv import load_dotenv
+load_dotenv()
+
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+PYTHON3_PATH = os.getenv('PYTHON3_PATH')
+HH_SUITE_BIN_PATH = os.getenv('HH_SUITE_BIN_PATH')
+PDB70_PATH = os.getenv('PDB70_PATH')
+S4PRED_PATH = os.getenv('S4PRED_PATH')
+BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+SPARK_MASTER_URL = os.getenv('SPARK_MASTER_URL')
+
+if not (HH_SUITE_BIN_PATH and PDB70_PATH and S4PRED_PATH and PYTHON3_PATH and BUCKET_NAME):
+    print("Please set the paths for S3_BUCKET_NAME, PYTHON3_PATH, HH_SUITE_BIN_PATH, PDB70_PATH and S4PRED_PATH in the .env file")
+    sys.exit(1)
+
+os.environ['PYSPARK_DRIVER_PYTHON'] = PYTHON3_PATH
+os.environ['PYSPARK_PYTHON'] = PYTHON3_PATH
 
 
 """
 usage: python pipeline_script.py INPUT.fasta  
 approx 5min per analysis
 """
-# Set spark environments
-PYTHON3_PATH = '/mnt/data/dataEng1CW/venv/bin/python3'
-os.environ['PYSPARK_PYTHON'] = PYTHON3_PATH
-os.environ['PYSPARK_DRIVER_PYTHON'] = PYTHON3_PATH
+
 
 def run_parser(hhr_file, output_file):
     """
@@ -34,12 +48,10 @@ def run_hhsearch(a3m_file):
     """
     Run HHSearch to produce the hhr file
     """
-    hh_suite_bin_path = "/mnt/data/programs/hh-suite/bin"
-    pdb70_path = "/mnt/data/pdb70/pdb70"
     
-    cmd = [hh_suite_bin_path + '/hhsearch',
+    cmd = [HH_SUITE_BIN_PATH + '/hhsearch',
            '-i', a3m_file, '-cpu', '1', '-d', 
-           pdb70_path]
+           PDB70_PATH]
     
     print(f'STEP 3: RUNNING HHSEARCH: {" ".join(cmd)}')
     
@@ -69,8 +81,7 @@ def run_s4pred(input_file, out_file):
     """
     Runs the s4pred secondary structure predictor to produce the horiz file
     """
-    s4pref_folder_path = "/mnt/data/programs/s4pred"
-    cmd = [PYTHON3_PATH, s4pref_folder_path + '/run_model.py',
+    cmd = [PYTHON3_PATH, S4PRED_PATH + '/run_model.py',
            '-t', 'horiz', '-T', '1', input_file]
     print(f'STEP 1: RUNNING S4PRED: {" ".join(cmd)}')
     p = Popen(cmd, stdin=PIPE,stdout=PIPE, stderr=PIPE)
@@ -126,9 +137,20 @@ def process_sequence(identifier, sequence, run_id, bucket, index):
     object_name = f"{run_id}/{index}.out"
     output_file = f"{ROOT_DIR}/output/{run_id}/{index}.out"
 
+    # Early exit if the folders are not set up correctly
+    if not os.path.exists(HH_SUITE_BIN_PATH):
+        print("Folder HH_SUITE_BIN_PATH does not exists: ", HH_SUITE_BIN_PATH)
+        sys.exit(1)
+    if not os.path.exists(PDB70_PATH+"_cs219.ffdata"):
+        print("Folder PDB70_PATH does not exists: ", PDB70_PATH)
+        sys.exit(1)
+    if not os.path.exists(S4PRED_PATH):
+        print("Folder S4PRED_PATH does not exists: ", S4PRED_PATH)
+        sys.exit(1)
+    
     os.makedirs(os.path.dirname(tmp_file), exist_ok=True)
     os.makedirs(os.path.dirname(horiz_file), exist_ok=True)
-    os.makedirs(os.path.dirname(a3m_file), exist_ok=True)
+    os.makedirs(os.path.dirname(a3m_file), exist_ok=True)  
 
     with open(tmp_file, "w") as fh_out:
         fh_out.write(f">{identifier}\n")
@@ -166,8 +188,8 @@ def merge_results(bucket, run_id):
 
 def argparser():
     run_id = "run_" + str(int(time())) + "_pyspark"
-    bucket = "comp0235-ucabfri"
-    master_url = "spark://ip-10-0-13-106.eu-west-2.compute.internal:7077"
+    bucket = BUCKET_NAME
+    master_url = SPARK_MASTER_URL
     """
     Function to parse the command line arguments
     """
@@ -203,6 +225,10 @@ if __name__ == "__main__":
         bucket = args.bucket
     if args.run_id:
         run_id = args.run_id
+
+    if not (master_url and args.local):
+        print("Please set the spark master with --master or run locally with --local")
+        sys.exit(1)
     
     spark = SparkSession.builder.appName("pdb_analyse").master(master_url).getOrCreate()
 
