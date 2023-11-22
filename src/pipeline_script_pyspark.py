@@ -11,12 +11,16 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 usage: python pipeline_script.py INPUT.fasta  
 approx 5min per analysis
 """
+# Set spark environments
+PYTHON3_PATH = '/mnt/data/dataEng1CW/venv/bin/python3'
+os.environ['PYSPARK_PYTHON'] = PYTHON3_PATH
+os.environ['PYSPARK_DRIVER_PYTHON'] = PYTHON3_PATH
 
 def run_parser(hhr_file, output_file):
     """
     Run the results_parser.py over the hhr file to produce the output summary
     """
-    cmd = ['python', './results_parser.py', hhr_file, output_file]
+    cmd = [PYTHON3_PATH, f'{ROOT_DIR}/results_parser.py', hhr_file, output_file]
     print(f'STEP 4: RUNNING PARSER: {" ".join(cmd)}')
     p = Popen(cmd, stdin=PIPE,stdout=PIPE, stderr=PIPE)
     out, err = p.communicate()
@@ -63,7 +67,7 @@ def run_s4pred(input_file, out_file):
     Runs the s4pred secondary structure predictor to produce the horiz file
     """
     s4pref_folder_path = "/mnt/data/s4pred"
-    cmd = ['python3', s4pref_folder_path + '/run_model.py',
+    cmd = [PYTHON3_PATH, s4pref_folder_path + '/run_model.py',
            '-t', 'horiz', '-T', '1', input_file]
     print(f'STEP 1: RUNNING S4PRED: {" ".join(cmd)}')
     p = Popen(cmd, stdin=PIPE,stdout=PIPE, stderr=PIPE)
