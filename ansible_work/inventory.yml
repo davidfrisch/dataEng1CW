@@ -1,5 +1,0 @@
-mymachines:
-  hosts:
-    machine01:
-      ansible_host: 10.0.13.106
-

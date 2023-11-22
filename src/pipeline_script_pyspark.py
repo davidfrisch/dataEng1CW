@@ -128,7 +128,7 @@ def cleanup(tmp_file, horiz_file, a3m_file, hhr_file):
 
 def process_sequence(k, v, run_id, bucket, index):
     mapping_file = f"{ROOT_DIR}/tmp/mapping.txt"
-    tmp_file = f"{ROOT_DIR}/tmp/tmp/{index}.fas"
+    tmp_file = f"{ROOT_DIR}/tmp/{index}.fas"
     horiz_file = f"{ROOT_DIR}/tmp/horiz/{index}.horiz"
     a3m_file = f"{ROOT_DIR}/tmp/a3m/{index}.a3m"
     hhr_file = f"{ROOT_DIR}/tmp/a3m/{index}.hhr"
@@ -177,8 +177,8 @@ if __name__ == "__main__":
     run_id = "run_test"
     bucket = "comp0235-ucabfri"
 
-    if len(sys.argv) != 2:
-        print("Usage: python script.py input_file")
+    if len(sys.argv) > 3:
+        print("Usage: python script.py input_file [--local]")
         sys.exit(1)
 
     # if --master is not specified, it will run locally
