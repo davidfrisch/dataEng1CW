@@ -30,7 +30,7 @@ def run_hhsearch(a3m_file):
     """
     Run HHSearch to produce the hhr file
     """
-    hh_suite_bin_path = "/mnt/data/hh-suite/bin"
+    hh_suite_bin_path = "/mnt/data/programs/hh-suite/bin"
     pdb70_path = "/mnt/data/pdb70/pdb70"
     
     cmd = [hh_suite_bin_path + '/hhsearch',
@@ -66,7 +66,7 @@ def run_s4pred(input_file, out_file):
     """
     Runs the s4pred secondary structure predictor to produce the horiz file
     """
-    s4pref_folder_path = "/mnt/data/s4pred"
+    s4pref_folder_path = "/mnt/data/programs/s4pred"
     cmd = [PYTHON3_PATH, s4pref_folder_path + '/run_model.py',
            '-t', 'horiz', '-T', '1', input_file]
     print(f'STEP 1: RUNNING S4PRED: {" ".join(cmd)}')
