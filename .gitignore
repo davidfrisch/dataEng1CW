@@ -8,3 +8,4 @@ venv
 data
 tmp
 *.csv
+__pycache__
