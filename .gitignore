@@ -7,3 +7,4 @@ venv
 *.fa
 data
 tmp
+*.csv
