@@ -1,0 +1,15 @@
+- name: Main Playbook
+  hosts: ec2-18-169-22-125.eu-west-2.compute.amazonaws.com
+  vars:
+    my_region: eu-west-2
+  module_defaults:
+    community.aws.ec2_instance_info:
+      region: '{{ my_region }}'
+    amazon.aws.ec2_vpc_net_info:
+      region: '{{ my_region }}'
+    amazon.aws.ec2_vol:
+      region: '{{ my_region }}'
+
+
+  tasks:
+    - include_tasks: partition_mount_disk.yml

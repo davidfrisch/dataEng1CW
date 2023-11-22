@@ -1,0 +1,8 @@
+- name: Create a new ext4 primary partition on /dev/nvme1n1
+  community.general.parted:
+    device: /dev/nvme1n1p1
+    number: 1
+    state: present
+    fs_type: ext4
+    part_start: 0%
+    part_end: 100%
