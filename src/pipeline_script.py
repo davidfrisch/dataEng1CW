@@ -10,6 +10,7 @@ from time import time
 import argparse
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
 """
 usage: python pipeline_script.py INPUT.fasta  
 approx 5min per analysis
@@ -44,7 +45,6 @@ def run_hhsearch(a3m_file):
     
     p = Popen(cmd, stdin=PIPE,stdout=PIPE, stderr=PIPE)
     out, err = p.communicate()
-
 
 def read_horiz(tmp_file, horiz_file, a3m_file):
     """
@@ -88,9 +88,6 @@ def run_s4pred(input_file, out_file):
       print("Error running s4pred")
       print(err)
       sys.exit(1)
-      
-
-
 
 def upload_file_to_s3(bucket, file_name, object_name=None):
     # If S3 object_name was not specified, use file_name
@@ -108,7 +105,6 @@ def upload_file_to_s3(bucket, file_name, object_name=None):
         return False
     return True
 
-
 def read_input(file):
     """
     Function reads a fasta formatted file of protein sequences
@@ -121,22 +117,22 @@ def read_input(file):
         ids.append(record.id)
     return(sequences)
 
-
-def process_sequence(k, v, run_id, bucket, index):
+def process_sequence(identifier, sequence, run_id, bucket, index):
+    print(f"PROCESSING SEQUENCE {index} of {len(sequence_list)}")
     tmp_file = f"{ROOT_DIR}/tmp/{run_id}/{index}.fas"
     horiz_file = f"{ROOT_DIR}/tmp/{run_id}/horiz/{index}.horiz"
     a3m_file = f"{ROOT_DIR}/tmp/{run_id}/a3m/{index}.a3m"
     hhr_file = f"{ROOT_DIR}/tmp/{run_id}/a3m/{index}.hhr"
     object_name = f"{run_id}/{index}.out"
     output_file = f"{ROOT_DIR}/output/{run_id}/{index}.out"
+
     os.makedirs(os.path.dirname(tmp_file), exist_ok=True)
     os.makedirs(os.path.dirname(horiz_file), exist_ok=True)
     os.makedirs(os.path.dirname(a3m_file), exist_ok=True)
 
     with open(tmp_file, "w") as fh_out:
-        fh_out.write(f">{k}\n")
-        fh_out.write(f"{v}\n")
-
+        fh_out.write(f">{identifier}\n")
+        fh_out.write(f"{sequence}\n")
 
     run_s4pred(tmp_file, horiz_file)
     read_horiz(tmp_file, horiz_file, a3m_file)
@@ -166,12 +162,15 @@ def merge_results(bucket, run_id):
         for line in results:
             fh_out.write(line + "\n")
 
+    print(f"Results written to {ROOT_DIR}/output/{run_id}/merge_result.csv")
 
-if __name__ == "__main__":
-    # unique random id for this run time + bucket name
+def argparser():
     run_id = "run_" + str(int(time())) + "_pyspark"
     bucket = "comp0235-ucabfri"
     master_url = "spark://ip-10-0-13-106.eu-west-2.compute.internal:7077"
+    """
+    Function to parse the command line arguments
+    """
     parser = argparse.ArgumentParser(
         prog='PDB Analyse',
         description='runs the data analysis pipeline to predict protein structure',
@@ -184,8 +183,17 @@ if __name__ == "__main__":
     parser.add_argument('--run_id', help='Unique run id', default=run_id)
 
     args = parser.parse_args()
-    
+    return args
+
+
+if __name__ == "__main__":
+    # unique random id for this run time + bucket name
     spark = None
+    master_url = None
+    bucket = None
+    run_id = None
+    args = argparser()
+
     if args.master:
         master_url = args.master
     if args.local:
@@ -196,24 +204,18 @@ if __name__ == "__main__":
     if args.run_id:
         run_id = args.run_id
     
-    
     spark = SparkSession.builder.appName("pdb_analyse").master(master_url).getOrCreate()
-    print("SPARK SESSION STARTED on ", master_url)
-
-    if os.path.exists(f"{ROOT_DIR}/output/{run_id}"):
-        os.system(f"rm -rf {ROOT_DIR}/output/{run_id}")
 
     os.makedirs(f"{ROOT_DIR}/output/{run_id}")
     
+    print("SPARK SESSION STARTED on ", master_url)
     print("START RUN ID: ", run_id)
-    sequences = read_input(args.input_file)
 
+    sequences = read_input(args.input_file)
     sequence_list = list(sequences.items())
 
     parallelised_data = spark.sparkContext.parallelize(sequence_list)
-
     parallelised_data.foreach(lambda x: process_sequence(x[0], x[1], run_id, bucket, sequence_list.index(x)))
 
     merge_results(bucket, run_id)
-
     spark.stop()
