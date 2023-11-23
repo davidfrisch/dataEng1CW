@@ -1,8 +1,44 @@
-- name: Create a new ext4 primary partition on /dev/nvme1n1
+- name: Create a new ext4 primary partition
+  become: yes
   community.general.parted:
-    device: /dev/nvme1n1p1
-    number: 1
+    device: /dev/nvme1n1
     state: present
+    number: 1
     fs_type: ext4
-    part_start: 0%
-    part_end: 100%
+    label: gpt
+
+- name: Create /mnt/data directory
+  become: yes
+  file:
+    path: /mnt/data
+    state: directory
+    mode: '0755'
+
+- name: create a mount point for the data volume
+  ansible.builtin.file:
+    path: /mnt/data
+    state: directory
+    mode: '0755' 
+
+- name: format the volume as ext4
+  community.general.filesystem:
+    dev: /dev/nvme1n1
+    fstype: ext4
+  become: true
+
+- name: mount the filesystem
+  become: true
+  ansible.posix.mount:
+    name: /mnt/data
+    src: /dev/nvme1n1
+    fstype: ext4
+    state: mounted 
+  become: true
+
+- name: change the owner back to ec2-user after mounting
+  become: true
+  ansible.builtin.file:
+    path: /mnt/data
+    state: directory
+    mode: u+rwx,a+x
+    owner: ec2-user

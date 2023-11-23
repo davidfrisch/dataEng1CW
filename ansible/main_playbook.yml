@@ -1,5 +1,5 @@
 - name: Main Playbook
-  hosts: ec2-18-169-22-125.eu-west-2.compute.amazonaws.com
+  hosts: clusters
   vars:
     my_region: eu-west-2
   module_defaults:
