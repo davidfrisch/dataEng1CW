@@ -5,7 +5,6 @@ venv
 *.horiz
 *.a3m
 *.fa
-data
 tmp
 *.csv
 __pycache__
