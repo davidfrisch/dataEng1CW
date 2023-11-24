@@ -1,5 +1,5 @@
 - name: Main Playbook
-  hosts: clusters
+  hosts: client
   become: yes
   vars:
     my_region: eu-west-2
@@ -20,7 +20,8 @@
 
     # - name: Install Repo
     #   include_tasks: tasks/install_repo.yml
-    - include_tasks: tasks/send_pdb70.yml
+    # - include_tasks: tasks/send_pdb70.yml
+    - include_tasks: tasks/download_pdb70.yml
       
     # - include_tasks: install_spark.yml
     

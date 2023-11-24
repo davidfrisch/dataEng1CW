@@ -1,0 +1,41 @@
+
+- name: download pdb70_from_mmcif_latest if it does not exist
+  get_url:
+    url: https://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/pdb70_from_mmcif_latest.tar.gz
+    dest: /mnt/data/pdb70_from_mmcif_latest.tar.gz
+    mode: 0755
+    owner: ec2-user
+    group: ec2-user
+    tmp_dest: /mnt/data/
+  when: not (ansible_check_mode | bool)
+  
+
+- name: create pdb70 directory
+  file:
+    path: /mnt/data/pdb70
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+    mode: '0755'  
+
+- name: extract pdb70_from_mmcif_latest
+  unarchive:
+    src: /mnt/data/pdb70_from_mmcif_latest.tar.gz
+    dest: /mnt/data/pdb70
+    remote_src: yes
+    owner: ec2-user
+    group: ec2-user
+    mode: 0755
+
+- name: Remove tar.gz
+  file:
+    path: /mnt/data/pdb70_from_mmcif_latest.tar.gz
+    state: absent
+
+- name: Ensure pdb70 exists on the remote server
+  file:
+    path: /mnt/data/pdb70
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+    mode: '0755'
