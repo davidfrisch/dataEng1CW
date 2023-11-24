@@ -1,0 +1,4 @@
+---
+- include_tasks: install_java.yml
+- include_tasks: install_spark.yml
+- include_tasks: set_ports_spark.yml

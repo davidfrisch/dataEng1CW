@@ -1,0 +1,21 @@
+---
+
+- name: Create spark-defaults.conf from spark-defaults.conf.template
+  copy:
+    src: "{{ spark_install_dir }}/conf/spark-defaults.conf.template"
+    dest: "{{ spark_install_dir }}/conf/spark-defaults.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Set spark driver port 40423
+  lineinfile:
+    dest: "{{ spark_install_dir }}/conf/spark-defaults.conf"
+    line: "spark.driver.port 40423"
+    state: present
+
+- name: Set spark block manager port 34541
+  lineinfile:
+    dest: "{{ spark_install_dir }}/conf/spark-defaults.conf"
+    line: "spark.blockManager.port 34541"
+    state: present

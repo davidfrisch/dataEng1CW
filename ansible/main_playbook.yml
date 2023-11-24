@@ -1,5 +1,6 @@
 - name: Main Playbook
   hosts: clusters
+  become: yes
   vars:
     my_region: eu-west-2
   module_defaults:
@@ -12,4 +13,4 @@
 
 
   tasks:
-    - include_tasks: partition_mount_disk.yml
+    - include_tasks: install_spark.yml

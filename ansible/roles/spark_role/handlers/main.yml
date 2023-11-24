@@ -1,0 +1,3 @@
+---
+# handlers file for spark
+# Handlers are commonly used in Ansible to start, reload, restart, and stop services

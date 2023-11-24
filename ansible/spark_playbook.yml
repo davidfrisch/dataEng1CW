@@ -1,0 +1,7 @@
+---
+- name: Install and configure Spark
+  hosts: clusters
+  become: yes
+
+  roles:
+    - spark_role

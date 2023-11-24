@@ -1,5 +1,7 @@
 #List of tasks that the playbook will execute
 
+- exchange ssh keys
+- update the system
 - partition the disk and mount it
 - open the ports
 - install pyspark

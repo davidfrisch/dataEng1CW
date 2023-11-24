@@ -1,20 +1,8 @@
+---
 
-- name: Install Java 8
-  yum:
-    name: java-1.8.0-openjdk
-    state: present
-
-- name: Verify Java 8 installation
-  command: java -version
-  register: java_version
-
-- name: Print Java 8 version
-  debug:
-    msg: "{{ java_version.stdout }}"
-
-- name: Set Spark install directory
+- name: Set Spark variable directory
   set_fact:
-    spark_install_dir: /opt/spark
+    spark_install_dir: "{{ spark_install_dir }}"
 
 - name: Verify if spark is already installed
   stat:
@@ -28,7 +16,7 @@
 
 - name: Download Spark
   get_url:
-    url: "https://dlcdn.apache.org/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz"
+    url: "{{ spark_download_url }}"
     dest: "/mnt/data/spark-3.5.0-bin-hadoop3.tgz"
     mode: 0755
     validate_certs: no
@@ -54,6 +42,7 @@
   command: mv /mnt/data/spark-3.5.0-bin-hadoop3 {{ spark_install_dir }}
   when: spark_installation.stat.exists == False
 
+# To check because it's not working
 - name: Set Spark environment variables in ~/.bashrc
   lineinfile:
     dest: ~/.bashrc
@@ -75,39 +64,3 @@
   debug:
     msg: "{{ spark_version.stdout }}"
 
-
-- name: Create spark-defaults.conf from spark-defaults.conf.template
-  copy:
-    src: "{{ spark_install_dir }}/conf/spark-defaults.conf.template"
-    dest: "{{ spark_install_dir }}/conf/spark-defaults.conf"
-    owner: root
-    group: root
-    mode: 0644
-
-- name: Set spark driver port 40423
-  lineinfile:
-    dest: "{{ spark_install_dir }}/conf/spark-defaults.conf"
-    line: "spark.driver.port 40423"
-    state: present
-
-- name: Set spark block manager port 34541
-  lineinfile:
-    dest: "{{ spark_install_dir }}/conf/spark-defaults.conf"
-    line: "spark.blockManager.port 34541"
-    state: present
-
-- name: Verify if firewalld exists
-  stat:
-    path: /usr/bin/firewalld
-  register: firewalld_status
-
-- name: Open ports for Spark in firewalld
-  firewalld:
-    port: "{{ item }}"
-    permanent: yes
-    state: enabled
-    immediate: yes
-  with_items:
-    - 40423/tcp
-    - 34541/tcp
-  when: firewalld_status.changed
