@@ -13,4 +13,8 @@
 
 
   tasks:
+    - name: Install Python 3.11
+      include_tasks: tasks/install_python311.yml
+      
     - include_tasks: install_spark.yml
+    

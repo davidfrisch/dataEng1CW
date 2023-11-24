@@ -1,0 +1,70 @@
+---
+- name: Check if Python 3.11 is already installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/python3.11
+  register: python_installation
+
+- name: Log Python installation status
+  ansible.builtin.debug:
+    msg: "Python 3.11 is already installed, skipping installation"
+  when: python_installation.stat.exists == True 
+
+- name: Install Python 3.11 from link
+  ansible.builtin.get_url:
+    url: https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz
+    dest: /mnt/data/Python-3.11.0.tgz
+    mode: 0755
+    validate_certs: no
+  register: python_download
+  when: python_installation.stat.exists == False
+
+- name: Extract Python
+  ansible.builtin.unarchive:
+    src: "{{ python_download.dest }}"
+    dest: /mnt/data/
+    remote_src: yes
+    creates: /mnt/data/Python-3.11.0
+  when: python_installation.stat.exists == False
+
+- name: Remove Python tarball if it exists
+  ansible.builtin.file:
+    path: "{{ python_download.dest }}"
+    state: absent
+  when: python_installation.stat.exists == False
+
+- name: Check if C compiler is installed
+  ansible.builtin.stat:
+    path: /usr/bin/gcc
+  register: gcc_installation
+
+- name: Install C compiler
+  ansible.builtin.yum:
+    name: gcc
+    state: present
+  when: gcc_installation.stat.exists == False
+
+- name: Install zlib-devel
+  ansible.builtin.yum:
+    name: zlib-devel
+    state: present
+
+- name: Configure the build and install Python 3.11
+  ansible.builtin.shell: |
+    cd /mnt/data/Python-3.11.0 && \
+    sudo ./configure --enable-optimizations && \
+    sudo make altinstall
+  when: python_installation.stat.exists == False
+
+- name: Check Python version
+  ansible.builtin.command: python3.11 --version
+  register: python_version
+
+- name: Print Python version
+  ansible.builtin.debug:
+    msg: "{{ python_version.stdout }}"
+
+- name: Clean up Python installation files
+  ansible.builtin.file:
+    path: /mnt/data/Python-3.11.0
+    state: absent
+  when: python_installation.stat.exists == False
