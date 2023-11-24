@@ -4,6 +4,7 @@
   vars:
     my_region: eu-west-2
     git_repo: git@github.com:davidfrisch/dataEng1CW.git
+    ansible_python_interpreter: /usr/bin/python3.11
   module_defaults:
     community.aws.ec2_instance_info:
       region: '{{ my_region }}'
@@ -17,8 +18,9 @@
     # - name: Install Python 3.11
     #   include_tasks: tasks/install_python311.yml
 
-    - name: Install Repo
-      include_tasks: tasks/install_repo.yml
+    # - name: Install Repo
+    #   include_tasks: tasks/install_repo.yml
+    - include_tasks: tasks/send_pdb70.yml
       
     # - include_tasks: install_spark.yml
     
