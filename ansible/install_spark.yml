@@ -1,0 +1,113 @@
+
+- name: Install Java 8
+  yum:
+    name: java-1.8.0-openjdk
+    state: present
+
+- name: Verify Java 8 installation
+  command: java -version
+  register: java_version
+
+- name: Print Java 8 version
+  debug:
+    msg: "{{ java_version.stdout }}"
+
+- name: Set Spark install directory
+  set_fact:
+    spark_install_dir: /opt/spark
+
+- name: Verify if spark is already installed
+  stat:
+    path: "{{ spark_install_dir }}"
+  register: spark_installation
+
+- name: Log spark installation status
+  debug:
+    msg: "Spark is already installed, skipping installation"
+  when: spark_installation.stat.exists == True
+
+- name: Download Spark
+  get_url:
+    url: "https://dlcdn.apache.org/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz"
+    dest: "/mnt/data/spark-3.5.0-bin-hadoop3.tgz"
+    mode: 0755
+    validate_certs: no
+  register: spark_download
+  when: spark_installation.stat.exists == False
+
+- name: Extract Spark
+  unarchive:
+    src: "{{ spark_download.dest }}"
+    dest: "/mnt/data/"
+    remote_src: yes
+    creates: "/mnt/data/spark-3.5.0-bin-hadoop3"
+  when: spark_installation.stat.exists == False
+
+- name: Remove Spark tarball if it exists
+  file:
+    path: "{{ spark_download.dest }}"
+    state: absent
+  when: spark_installation.stat.exists == False
+  
+
+- name: Move Spark to /opt
+  command: mv /mnt/data/spark-3.5.0-bin-hadoop3 {{ spark_install_dir }}
+  when: spark_installation.stat.exists == False
+
+- name: Set Spark environment variables in ~/.bashrc
+  lineinfile:
+    dest: ~/.bashrc
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "export SPARK_HOME={{ spark_install_dir }}"
+    - "export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin"
+  when: spark_installation.stat.exists == False
+
+- name: Source ~/.bashrc
+  shell: source ~/.bashrc
+
+- name: Check Spark version
+  command: "{{ spark_install_dir }}/bin/spark-shell --version"
+  register: spark_version
+
+- name: Print Spark version
+  debug:
+    msg: "{{ spark_version.stdout }}"
+
+
+- name: Create spark-defaults.conf from spark-defaults.conf.template
+  copy:
+    src: "{{ spark_install_dir }}/conf/spark-defaults.conf.template"
+    dest: "{{ spark_install_dir }}/conf/spark-defaults.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Set spark driver port 40423
+  lineinfile:
+    dest: "{{ spark_install_dir }}/conf/spark-defaults.conf"
+    line: "spark.driver.port 40423"
+    state: present
+
+- name: Set spark block manager port 34541
+  lineinfile:
+    dest: "{{ spark_install_dir }}/conf/spark-defaults.conf"
+    line: "spark.blockManager.port 34541"
+    state: present
+
+- name: Verify if firewalld exists
+  stat:
+    path: /usr/bin/firewalld
+  register: firewalld_status
+
+- name: Open ports for Spark in firewalld
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+    immediate: yes
+  with_items:
+    - 40423/tcp
+    - 34541/tcp
+  when: firewalld_status.changed
