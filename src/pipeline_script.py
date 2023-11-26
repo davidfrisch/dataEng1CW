@@ -29,6 +29,43 @@ os.environ['PYSPARK_DRIVER_PYTHON'] = PYTHON3_PATH
 os.environ['PYSPARK_PYTHON'] = PYTHON3_PATH
 
 
+def write_profile_csv(merged_results_csv, output_file):
+    """
+    Function to write the mean Standard Deviation and mean Geometric means for all the sequences 
+    """
+    csv_reader = csv.reader(open(merged_results_csv, "r"), delimiter=",")
+    header = next(csv_reader)
+
+    score_std_index = int(header.index('score_std'))
+    score_gmean_index = int(header.index('score_gmean'))
+
+    if not (isinstance(score_std_index, int) and isinstance(score_gmean_index, int)):
+        print("Cannot find score_std and score_gmean columns in the results file")
+        sys.exit(1)
+    
+    score_std = []
+    score_gmean = []
+    for row in csv_reader:
+        row_std = str(row[score_std_index])
+        row_gmean = str(row[score_gmean_index])
+
+        # check if the values are not NaN
+        if row_std.lower() != 'nan':
+            score_std.append(float(row_std))  
+        if row_gmean.lower() != 'nan':
+            score_gmean.append(float(row_gmean))
+
+    if len(score_std) == 0 or len(score_gmean) == 0:
+        print("No valid values found in the results file")
+        sys.exit(1)
+
+    with open(output_file, "w") as fh_out:
+        fh_out.write("score_std,score_gmean\n")
+        fh_out.write(f"{sum(score_std)/len(score_std)},{sum(score_gmean)/len(score_gmean)}\n")
+
+  
+
+
 def write_best_hits(merged_results_csv, output_file):
     """
     Function to write the best hits to the output file
@@ -244,36 +281,36 @@ if __name__ == "__main__":
     master_url = None
     bucket = None
     run_id = None
-    # args = argparser()
+    args = argparser()
 
-    write_best_hits(f"{ROOT_DIR}/output/run_1700732749_pyspark/merge_result.csv", f"{ROOT_DIR}/output/run_1700732749_pyspark/best_hits.csv")
+    if args.master:
+        master_url = args.master
+    if args.local:
+        print("RUNNING LOCALLY")
+        master_url = "local[*]"
+    if args.bucket:
+        bucket = args.bucket
+    if args.run_id:
+        run_id = args.run_id
 
-    # if args.master:
-    #     master_url = args.master
-    # if args.local:
-    #     print("RUNNING LOCALLY")
-    #     master_url = "local[*]"
-    # if args.bucket:
-    #     bucket = args.bucket
-    # if args.run_id:
-    #     run_id = args.run_id
-
-    # if not (master_url and args.local):
-    #     print("Please set the spark master with --master or run locally with --local")
-    #     sys.exit(1)
+    if not (master_url and args.local):
+        print("Please set the spark master with --master or run locally with --local")
+        sys.exit(1)
     
-    # spark = SparkSession.builder.appName("pdb_analyse").master(master_url).getOrCreate()
+    spark = SparkSession.builder.appName("pdb_analyse").master(master_url).getOrCreate()
 
-    # os.makedirs(f"{ROOT_DIR}/output/{run_id}")
+    os.makedirs(f"{ROOT_DIR}/output/{run_id}")
     
-    # print("SPARK SESSION STARTED on ", master_url)
-    # print("START RUN ID: ", run_id)
+    print("SPARK SESSION STARTED on ", master_url)
+    print("START RUN ID: ", run_id)
 
-    # sequences = read_input(args.input_file)
-    # sequence_list = list(sequences.items())
+    sequences = read_input(args.input_file)
+    sequence_list = list(sequences.items())
 
-    # parallelised_data = spark.sparkContext.parallelize(sequence_list)
-    # parallelised_data.foreach(lambda x: process_sequence(x[0], x[1], run_id, bucket, sequence_list.index(x)))
+    parallelised_data = spark.sparkContext.parallelize(sequence_list)
+    parallelised_data.foreach(lambda x: process_sequence(x[0], x[1], run_id, bucket, sequence_list.index(x)))
 
-    # merge_results(bucket, run_id)
-    # spark.stop()
+    merge_results(bucket, run_id)
+    write_best_hits(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", f"{ROOT_DIR}/output/{run_id}/best_hits_output.csv")
+    write_profile_csv(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", f"{ROOT_DIR}/output/{run_id}/profile_output.csv")
+    spark.stop()
