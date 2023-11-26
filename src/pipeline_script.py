@@ -9,6 +9,7 @@ from botocore.exceptions import ClientError
 from time import time
 import argparse
 from dotenv import load_dotenv
+import csv
 load_dotenv()
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -27,6 +28,35 @@ if not (HH_SUITE_BIN_PATH and PDB70_PATH and S4PRED_PATH and PYTHON3_PATH and BU
 os.environ['PYSPARK_DRIVER_PYTHON'] = PYTHON3_PATH
 os.environ['PYSPARK_PYTHON'] = PYTHON3_PATH
 
+
+def write_best_hits(merged_results_csv, output_file):
+    """
+    Function to write the best hits to the output file
+    """
+    csv_reader = csv.reader(open(merged_results_csv, "r"), delimiter=",")
+
+    # Skip the header row
+    header = next(csv_reader)
+    print(header)
+    # Extract query_id and best_hit indices from the header
+    query_id_index = int(header.index('query_id'))
+    best_hit_index = int(header.index('best_hit'))
+    print(query_id_index, best_hit_index)
+
+    if not (isinstance(query_id_index, int) and isinstance(best_hit_index, int)):
+        print("Cannot find query_id and best_hit columns in the results file")
+        sys.exit(1)
+
+    # Iterate over the rows and extract query_id and best_hit values
+    best_hits = []
+    for row in csv_reader:
+        best_hits.append((row[query_id_index], row[best_hit_index]))
+
+    # Write the best hits to the output file
+    with open(output_file, "w") as fh_out:
+        fh_out.write("fasta_id,best_hit_id\n")
+        for best_hit in best_hits:
+            fh_out.write(f"{best_hit[0]},{best_hit[1]}\n")
 
 """
 usage: python pipeline_script.py INPUT.fasta  
@@ -214,34 +244,36 @@ if __name__ == "__main__":
     master_url = None
     bucket = None
     run_id = None
-    args = argparser()
+    # args = argparser()
 
-    if args.master:
-        master_url = args.master
-    if args.local:
-        print("RUNNING LOCALLY")
-        master_url = "local[*]"
-    if args.bucket:
-        bucket = args.bucket
-    if args.run_id:
-        run_id = args.run_id
+    write_best_hits(f"{ROOT_DIR}/output/run_1700732749_pyspark/merge_result.csv", f"{ROOT_DIR}/output/run_1700732749_pyspark/best_hits.csv")
 
-    if not (master_url and args.local):
-        print("Please set the spark master with --master or run locally with --local")
-        sys.exit(1)
+    # if args.master:
+    #     master_url = args.master
+    # if args.local:
+    #     print("RUNNING LOCALLY")
+    #     master_url = "local[*]"
+    # if args.bucket:
+    #     bucket = args.bucket
+    # if args.run_id:
+    #     run_id = args.run_id
+
+    # if not (master_url and args.local):
+    #     print("Please set the spark master with --master or run locally with --local")
+    #     sys.exit(1)
     
-    spark = SparkSession.builder.appName("pdb_analyse").master(master_url).getOrCreate()
+    # spark = SparkSession.builder.appName("pdb_analyse").master(master_url).getOrCreate()
 
-    os.makedirs(f"{ROOT_DIR}/output/{run_id}")
+    # os.makedirs(f"{ROOT_DIR}/output/{run_id}")
     
-    print("SPARK SESSION STARTED on ", master_url)
-    print("START RUN ID: ", run_id)
+    # print("SPARK SESSION STARTED on ", master_url)
+    # print("START RUN ID: ", run_id)
 
-    sequences = read_input(args.input_file)
-    sequence_list = list(sequences.items())
+    # sequences = read_input(args.input_file)
+    # sequence_list = list(sequences.items())
 
-    parallelised_data = spark.sparkContext.parallelize(sequence_list)
-    parallelised_data.foreach(lambda x: process_sequence(x[0], x[1], run_id, bucket, sequence_list.index(x)))
+    # parallelised_data = spark.sparkContext.parallelize(sequence_list)
+    # parallelised_data.foreach(lambda x: process_sequence(x[0], x[1], run_id, bucket, sequence_list.index(x)))
 
-    merge_results(bucket, run_id)
-    spark.stop()
+    # merge_results(bucket, run_id)
+    # spark.stop()
