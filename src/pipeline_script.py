@@ -159,7 +159,7 @@ def read_input(file):
     return(sequences)
 
 def process_sequence(identifier, sequence, run_id, bucket, index):
-    print(f"PROCESSING SEQUENCE {index} of {len(sequence_list)}")
+    print(f"PROCESSING SEQUENCE {index} with id {identifier}")
     tmp_file = f"{ROOT_DIR}/tmp/{run_id}/{index}.fas"
     horiz_file = f"{ROOT_DIR}/tmp/{run_id}/horiz/{index}.horiz"
     a3m_file = f"{ROOT_DIR}/tmp/{run_id}/a3m/{index}.a3m"
