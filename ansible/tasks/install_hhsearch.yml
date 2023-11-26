@@ -1,0 +1,19 @@
+- name: Create hh_suite directory
+  file:
+    path: "{{ hh_suite_dir }}"
+    state: directory
+    mode: 0755
+
+- name: Download hh_suite
+  get_url:
+    url: "{{ hh_suite_url }}"
+    dest: "{{ hh_suite_dir }}/{{ hh_suite_file }}"
+    mode: 0755
+
+- name: Extract hh_suite
+  unarchive:
+    src: "{{ hh_suite_dir }}/{{ hh_suite_file }}"
+    dest: "{{ hh_suite_dir }}"
+    remote_src: yes
+    creates: "{{ hh_suite_dir }}/bin/hhsearch"
+

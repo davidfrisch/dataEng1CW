@@ -1,10 +1,15 @@
 - name: Main Playbook
-  hosts: client
+  hosts: clusters
   become: yes
   vars:
     my_region: eu-west-2
     git_repo: git@github.com:davidfrisch/dataEng1CW.git
     ansible_python_interpreter: /usr/bin/python3.11
+    # hh_suite vars
+    hh_suite_dir: /mnt/data/hh-suite
+    hh_suite_file: hhsuite-3.3.0-AVX2-Linux.tar.gz
+    hh_suite_url: https://github.com/soedinglab/hh-suite/releases/download/v3.3.0/hhsuite-3.3.0-AVX2-Linux.tar.gz
+    ###
   module_defaults:
     community.aws.ec2_instance_info:
       region: '{{ my_region }}'
@@ -21,7 +26,7 @@
     # - name: Install Repo
     #   include_tasks: tasks/install_repo.yml
     # - include_tasks: tasks/send_pdb70.yml
-    - include_tasks: tasks/download_pdb70.yml
-      
+    # - include_tasks: tasks/download_pdb70.yml
+      - include_tasks: tasks/install_hhsearch.yml
     # - include_tasks: install_spark.yml
     
