@@ -249,7 +249,8 @@ def merge_results(bucket, run_id):
     with open(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", "w") as fh_out:
         fh_out.write("query_id,best_hit,best_evalue,best_score,score_mean,score_std,score_gmean\n")
         for line in results:
-            fh_out.write(line + "\n")
+            if line != "":
+                fh_out.write(line + "\n")
 
     print(f"Results written to {ROOT_DIR}/output/{run_id}/merge_result.csv")
 
@@ -299,7 +300,8 @@ if __name__ == "__main__":
     
     spark = SparkSession.builder.appName("pdb_analyse").master(master_url).getOrCreate()
 
-    os.makedirs(f"{ROOT_DIR}/output/{run_id}")
+    if not args.run_id:
+        os.makedirs(f"{ROOT_DIR}/output/{run_id}")
     
     print("SPARK SESSION STARTED on ", master_url)
     print("START RUN ID: ", run_id)

@@ -30,7 +30,7 @@ def run_hhr_parser(hhr_file, output_file):
     std=format(np.std(good_hit_scores), ".2f")
     g_mean=format(gmean(good_hit_scores), ".2f")
 
-    fhOut.write(f"{id},{best_hit[0]},{best_hit[1]},{best_hit[2]},{mean},{std},{g_mean}\n")
+    fhOut.write(f"{id},{best_hit[0]},{best_hit[1]},{best_hit[2]},{mean},{std},{g_mean}")
     fhOut.close()
     print(f"Results written to {output_file}")
 
