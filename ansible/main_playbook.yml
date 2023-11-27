@@ -1,5 +1,6 @@
 - name: Main Playbook
   hosts: clusters
+  become: true
   vars:
     my_region: eu-west-2
     git_repo: git@github.com:davidfrisch/dataEng1CW.git
@@ -29,10 +30,10 @@
     #     name: spark_role
     # - name: Install Python 3.11
     #   include_tasks: tasks/install_python311.yml
-
+    - include_tasks: tasks/install_docker.yml
     # - name: Install Repo
     #   include_tasks: tasks/install_repo.yml
-    - include_tasks: tasks/send_pdb70_from_client.yml
+   #  - include_tasks: tasks/send_pdb70_from_client.yml
     # - include_tasks: tasks/download_pdb70.yml
     #  - include_tasks: tasks/install_hhsearch.yml
     #  - include_tasks: tasks/install_s4pred.yml
