@@ -16,7 +16,7 @@
   become: yes
   ansible.posix.synchronize:
     src: /mnt/data/pdb70
-    dest: /mnt/data/pdb70
+    dest: /mnt/data/
   # TODO when trying from the host machine
   # delegate_to: "{{ groups['client'][0] }}"
   
