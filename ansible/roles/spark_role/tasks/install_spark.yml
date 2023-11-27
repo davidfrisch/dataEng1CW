@@ -1,12 +1,8 @@
 ---
 
-- name: Set Spark variable directory
-  set_fact:
-    spark_install_dir: "{{ spark_install_dir }}"
-
 - name: Verify if spark is already installed
   stat:
-    path: "{{ spark_install_dir }}"
+    path: "{{ spark_install_dir }}/bin/spark-shell"
   register: spark_installation
 
 - name: Log spark installation status
@@ -15,34 +11,45 @@
   when: spark_installation.stat.exists == True
 
 - name: Download Spark
+  become: yes
   get_url:
     url: "{{ spark_download_url }}"
-    dest: "/mnt/data/spark-3.5.0-bin-hadoop3.tgz"
+    dest: "{{ spark_download_dest }}"
     mode: 0755
     validate_certs: no
-  register: spark_download
+  when: spark_installation.stat.exists == False
+
+
+- name: Change owner of Spark installation directory
+  become: yes
+  file:
+    path: "{{ spark_install_dir }}/Spark"
+    owner: ec2-user
+    group: ec2-user
+    mode: 0755
+    recurse: yes
   when: spark_installation.stat.exists == False
 
 - name: Extract Spark
+  become: yes
   unarchive:
-    src: "{{ spark_download.dest }}"
-    dest: "/mnt/data/"
+    src: "{{ spark_download_dest }}"
+    dest: "{{ spark_install_dir }}"
     remote_src: yes
-    creates: "/mnt/data/spark-3.5.0-bin-hadoop3"
-  when: spark_installation.stat.exists == False
+    creates: "{{ spark_install_dir }}/bin/spark-shell"
 
 - name: Remove Spark tarball if it exists
+  become: yes
   file:
-    path: "{{ spark_download.dest }}"
+    path: "{{ spark_download_dest }}"
     state: absent
   when: spark_installation.stat.exists == False
-  
 
-- name: Move Spark to /opt
-  command: mv /mnt/data/spark-3.5.0-bin-hadoop3 {{ spark_install_dir }}
+- name: Change spark name folder
+  become: yes
+  command: mv {{ spark_install_dir }}/{{ spark_folder_name }} {{ spark_install_dir }}/spark
   when: spark_installation.stat.exists == False
-
-# To check because it's not working
+  
 - name: Set Spark environment variables in ~/.bashrc
   lineinfile:
     dest: ~/.bashrc
@@ -57,7 +64,8 @@
   shell: source ~/.bashrc
 
 - name: Check Spark version
-  command: "{{ spark_install_dir }}/bin/spark-shell --version"
+  become: yes
+  command: "{{ spark_install_dir }}/spark/bin/spark-shell --version"
   register: spark_version
 
 - name: Print Spark version

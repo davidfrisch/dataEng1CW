@@ -1,14 +1,17 @@
 - name: Main Playbook
   hosts: clusters
-  become: yes
   vars:
     my_region: eu-west-2
     git_repo: git@github.com:davidfrisch/dataEng1CW.git
     ansible_python_interpreter: /usr/bin/python3.11
     # hh_suite vars
-    hh_suite_dir: /mnt/data/hh-suite
+    hh_suite_dir: /mnt/data/programs/hh-suite
     hh_suite_file: hhsuite-3.3.0-AVX2-Linux.tar.gz
     hh_suite_url: https://github.com/soedinglab/hh-suite/releases/download/v3.3.0/hhsuite-3.3.0-AVX2-Linux.tar.gz
+    # s4pred vars
+    s4pred_dir: /mnt/data/programs/s4pred
+
+
     ###
   module_defaults:
     community.aws.ec2_instance_info:
@@ -20,6 +23,10 @@
 
 
   tasks:
+    # add spark role
+    - name: Add spark role
+      import_role:
+        name: spark_role
     # - name: Install Python 3.11
     #   include_tasks: tasks/install_python311.yml
 

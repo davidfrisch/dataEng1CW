@@ -2,7 +2,7 @@
 - name: Git clone s4pred
   ansible.builtin.git:
     repo: git@github.com:psipred/s4pred.git
-    dest: /mnt/data/s4pred
+    dest: "{{ s4pred_dir }}"
     accept_hostkey: yes
     key_file: /home/ec2-user/.ssh/david_student_key
 
@@ -10,18 +10,18 @@
 - name: Download the weights
   get_url:
     url: "http://bioinfadmin.cs.ucl.ac.uk/downloads/s4pred/weights.tar.gz"
-    dest: /mnt/data/s4pred/weights.tar.gz
+    dest: "{{ s4pred_dir }}/weights.tar.gz"
     mode: 0755
     
 
 - name: Extract the weights
   unarchive:
-    src: /mnt/data/s4pred/weights.tar.gz
-    dest: /mnt/data/s4pred
+    src: "{{ s4pred_dir }}/weights.tar.gz"
+    dest: "{{ s4pred_dir }}"
     remote_src: yes
-    creates: /mnt/data/s4pred/weights
+    creates: "{{ s4pred_dir }}"/weights
 
 - name: Clean up
   file:
-    path: /mnt/data/s4pred/weights.tar.gz
+    path: "{{ s4pred_dir }}/weights.tar.gz"
     state: absent
