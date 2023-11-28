@@ -24,18 +24,21 @@
 
 
   tasks:
+    # - include_tasks: tasks/install_repo.yml
+    - include_tasks: tasks/update_repo.yml
     # add spark role
     # - name: Add spark role
     #   import_role:
     #     name: spark_role
     # - name: Install Python 3.11
     #   include_tasks: tasks/install_python311.yml
-    - include_tasks: tasks/install_docker.yml
-    # - name: Install Repo
-    #   include_tasks: tasks/install_repo.yml
-   #  - include_tasks: tasks/send_pdb70_from_client.yml
+    # - include_tasks: tasks/install_docker.yml
+    # - name: Install and Update git Repo
+    #   include_tasks: tasks/install_update_repo.yml
+
+
+    # - include_tasks: tasks/send_pdb70_from_client.yml
     # - include_tasks: tasks/download_pdb70.yml
-    #  - include_tasks: tasks/install_hhsearch.yml
-    #  - include_tasks: tasks/install_s4pred.yml
-    # - include_tasks: install_spark.yml
+    # - include_tasks: tasks/install_hhsearch.yml
+    # - include_tasks: tasks/install_s4pred.yml
     
