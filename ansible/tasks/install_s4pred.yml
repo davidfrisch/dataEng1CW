@@ -12,6 +12,7 @@
     url: "http://bioinfadmin.cs.ucl.ac.uk/downloads/s4pred/weights.tar.gz"
     dest: "{{ s4pred_dir }}/weights.tar.gz"
     mode: 0755
+  register: download_weights
     
 
 - name: Extract the weights
@@ -19,7 +20,7 @@
     src: "{{ s4pred_dir }}/weights.tar.gz"
     dest: "{{ s4pred_dir }}"
     remote_src: yes
-    creates: "{{ s4pred_dir }}"/weights
+    creates: "{{ s4pred_dir }}/weights"
 
 - name: Clean up
   file:

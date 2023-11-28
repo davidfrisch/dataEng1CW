@@ -1,6 +1,6 @@
 import sys
 from botocore.exceptions import ClientError
-from constants import PYTHON3_PATH, HH_SUITE_BIN_PATH, PDB70_PATH, S4PRED_PATH, SRC_DIR
+from constants import PYTHON3_PATH, HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, SRC_DIR
 from subprocess import Popen, PIPE
 import boto3
 
@@ -54,7 +54,7 @@ def run_hhsearch(a3m_file):
     Run HHSearch to produce the hhr file
     """
     
-    cmd = [HH_SUITE_BIN_PATH + '/hhsearch',
+    cmd = [HH_SUITE__BIN_PATH + '/hhsearch',
            '-i', a3m_file, '-cpu', '1', '-d', 
            PDB70_PATH]
     

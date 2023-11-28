@@ -4,6 +4,7 @@
   vars:
     my_region: eu-west-2
     git_repo: git@github.com:davidfrisch/dataEng1CW.git
+    repo_dir: /mnt/data/dataEng1CW
     ansible_python_interpreter: /usr/bin/python3.11
     # hh_suite vars
     hh_suite_dir: /mnt/data/programs/hh-suite
@@ -24,21 +25,82 @@
 
 
   tasks:
-    # - include_tasks: tasks/install_repo.yml
+
+    - name: Check if the /dev/nvme1n1p1 directory exists
+      stat:
+        path: /mnt/data
+      register: mnt_data_dir
+
+    - name: Echo the result
+      debug:
+        msg: "{{ mnt_data_dir.stat.exists }}"
+      when: not mnt_data_dir.stat.exists
+      
+    - include_tasks: tasks/partition_mount_disk.yml
+      when: not mnt_data_dir.stat.exists
+
+    - name: Check if Python 3.11 is already installed
+      ansible.builtin.stat:
+        path: /usr/local/bin/python3.11
+      register: python_installation
+
+    - name: Install Python 3.11
+      include_tasks: tasks/install_python311.yml
+      when: not python_installation.stat.exists 
+    
+    - name: Add spark role
+      import_role:
+        name: spark_role
+    
+    - name: Check if Docker is already installed
+      ansible.builtin.stat:
+        path: /usr/bin/docker
+      register: docker_installation
+
+    - name: Install Docker
+      include_tasks: tasks/install_docker.yml
+      when: not docker_installation.stat.exists
+    
+    - name: Check if Repo is already installed
+      ansible.builtin.stat:
+        path: "{{ repo_dir }}"
+      register: repo_installation
+
+    - name: Install Repo
+      include_tasks: tasks/install_repo.yml
+      when: not repo_installation.stat.exists  
+
     - include_tasks: tasks/update_repo.yml
-    # add spark role
-    # - name: Add spark role
-    #   import_role:
-    #     name: spark_role
-    # - name: Install Python 3.11
-    #   include_tasks: tasks/install_python311.yml
-    # - include_tasks: tasks/install_docker.yml
-    # - name: Install and Update git Repo
-    #   include_tasks: tasks/install_update_repo.yml
+    
+    # # TODO role for client
+    # # - include_tasks: tasks/download_pdb70.yml
 
+    - name: Check if HH-search is already installed
+      ansible.builtin.stat:
+        path: "{{ hh_suite_dir }}"
+      register: hh_suite_installation
+    
+    - name: Install HH-suite
+      include_tasks: tasks/install_hh_suite.yml
+      when: not hh_suite_installation.stat.exists
+    
 
-    # - include_tasks: tasks/send_pdb70_from_client.yml
-    # - include_tasks: tasks/download_pdb70.yml
-    # - include_tasks: tasks/install_hhsearch.yml
-    # - include_tasks: tasks/install_s4pred.yml
+    - name: Check if S4pred is already installed
+      ansible.builtin.stat:
+        path: "{{ s4pred_dir }}"
+      register: s4pred_installation
+
+    - name: Install S4pred
+      include_tasks: tasks/install_s4pred.yml
+      when: not s4pred_installation.stat.exists
+
+    # Check if pdb70 is already downloaded
+    - name: Check if pdb70 is already downloaded
+      ansible.builtin.stat:
+        path: /mnt/data/pdb70
+      register: pdb70_installation
+
+    - name: Copy pdb70 from client
+      include_tasks: tasks/send_pdb70_from_client.yml
+      when: not pdb70_installation.stat.exists
     

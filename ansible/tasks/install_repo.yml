@@ -15,20 +15,20 @@
 - name: clone git repo
   git:
     repo: '{{ git_repo }}'
-    dest: /mnt/data/dataEng1CW
+    dest: "{{ repo_dir }}"
     accept_hostkey: yes
     key_file: /home/ec2-user/.ssh/david_student_key
 
 
 - name: create environment 3.11
   shell: |
-    cd /mnt/data/dataEng1CW 
+    cd {{ repo_dir }}
     python3.11 -m venv venv
 
 
 - name: install requirements
   shell: |
-    cd /mnt/data/dataEng1CW && \
+    cd {{ repo_dir }} && \
     source venv/bin/activate && \
     TMPDIR=/mnt/data pip install -r requirements.txt --no-cache --cache-dir=/mnt/data/pip_cache
 

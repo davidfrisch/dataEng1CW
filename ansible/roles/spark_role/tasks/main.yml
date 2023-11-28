@@ -1,4 +1,23 @@
 ---
-- include_tasks: install_java.yml
-- include_tasks: install_spark.yml
-- include_tasks: set_ports_spark.yml
+- name: Check if $SPARK_HOME directory exists
+  stat:
+    path: /opt/spark
+  register: spark_dir
+
+- name: Echo the result
+  debug:
+    msg: "{{ spark_dir.stat.exists }}"
+  when: not spark_dir.stat.exists
+
+- name: Install Java
+  include_tasks: tasks/install_java.yml
+  when: not spark_dir.stat.exists
+
+- name: Install Spark
+  include_tasks: tasks/install_spark.yml
+  when: not spark_dir.stat.exists
+
+- name: Set ports for Spark
+  include_tasks: tasks/set_ports_spark.yml
+  when: not spark_dir.stat.exists
+

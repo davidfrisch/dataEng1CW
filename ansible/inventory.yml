@@ -2,7 +2,7 @@
 ec2-35-178-4-221.eu-west-2.compute.amazonaws.com
 
 [clusters]
-ec2-18-169-22-125.eu-west-2.compute.amazonaws.com
+# ec2-18-169-22-125.eu-west-2.compute.amazonaws.com
 # ec2-18-134-114-147.eu-west-2.compute.amazonaws.com
 # ec2-35-178-241-218.eu-west-2.compute.amazonaws.com
-# ec2-35-177-190-96.eu-west-2.compute.amazonaws.com
+ec2-35-177-190-96.eu-west-2.compute.amazonaws.com

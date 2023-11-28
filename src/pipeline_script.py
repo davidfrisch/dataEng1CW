@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
-from constants import HH_SUITE_BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR
+from constants import HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR
 from Bio import SeqIO
 from pyspark.sql import SparkSession
 from pipeline_argparser import argparser
@@ -35,8 +35,8 @@ def process_sequence(identifier, sequence, run_id, bucket, index):
     output_file = f"{ROOT_DIR}/output/{run_id}/{index}.out"
 
     # Early exit if the folders are not set up correctly
-    if not os.path.exists(HH_SUITE_BIN_PATH):
-        print("Folder HH_SUITE_BIN_PATH does not exists: ", HH_SUITE_BIN_PATH)
+    if not os.path.exists(HH_SUITE__BIN_PATH):
+        print("Folder HH_SUITE__BIN_PATH does not exists: ", HH_SUITE__BIN_PATH)
         sys.exit(1)
     if not os.path.exists(PDB70_PATH+"_cs219.ffdata"):
         print("Folder PDB70_PATH does not exists: ", PDB70_PATH)

@@ -3,6 +3,6 @@
 - name: Update git repo
   git:
     repo: '{{ git_repo }}'
-    dest: /mnt/data/dataEng1CW
+    dest: "{{ repo_dir }}"
     accept_hostkey: yes
     key_file: /home/ec2-user/.ssh/david_student_key
