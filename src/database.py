@@ -3,14 +3,21 @@ from models.protein_result import ProteinResults
 from models.proteome import Proteomes
 # psql -U postgres -W -h localhost -c "CREATE DATABASE proteomics;"
 # Replace placeholders with your PostgreSQL credentials
-db_url = "postgresql://postgres:postgres@localhost:5432/proteomics"
-engine = create_engine(db_url)
 
+def get_engine():
+    db_url = "postgresql://postgres:postgres@localhost:5432/proteomics"
+    engine = create_engine(db_url)
+    return engine
 # connect to the database
 from sqlalchemy.orm import sessionmaker
 
-Session = sessionmaker(bind=engine)
-session = Session()
+def create_session():
+    engine = get_engine()
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    return session
+
+engine = get_engine()
 if engine.connect().closed:
     print("Not connected to the database")
 else:
