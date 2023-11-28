@@ -19,7 +19,6 @@ def read_input(file):
 
 if __name__ == "__main__":
     ids = read_input(sys.argv[1])
-    # print(ids)
     rand_list = random.sample(ids, int(sys.argv[2]))
     for id in rand_list:
         print(id)

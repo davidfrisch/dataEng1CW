@@ -3,7 +3,6 @@ from models.proteome import Proteomes
 import argparse
 
 
-
 def get_proteins(list_ids: list):
     session = create_session()
     proteins = session.query(Proteomes).filter(Proteomes.id.in_(list_ids)).all()
