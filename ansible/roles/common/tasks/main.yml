@@ -1,0 +1,63 @@
+---
+# tasks file for common
+
+- name: Check if the /dev/nvme1n1p1 directory exists
+  ansible.builtin.stat:
+    path: /mnt/data
+  register: mnt_data_dir
+  
+- include_tasks: tasks/partition_mount_disk.yml
+  when: not mnt_data_dir.stat.exists
+
+- name: Check if Python 3.11 is already installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/python3.11
+  register: python_installation
+
+- name: Install Python 3.11
+  include_tasks: tasks/install_python311.yml
+  when: not python_installation.stat.exists 
+
+- name: Add spark role
+  import_role:
+    name: spark_role
+
+- name: Check if Docker is already installed
+  ansible.builtin.stat:
+    path: /usr/bin/docker
+  register: docker_installation
+
+- name: Install Docker
+  include_tasks: tasks/install_docker.yml
+  when: not docker_installation.stat.exists
+
+- name: Check if Repo is already installed
+  ansible.builtin.stat:
+    path: "{{ repo_dir }}"
+  register: repo_installation
+
+- name: Install Repo
+  include_tasks: tasks/install_repo.yml
+  when: not repo_installation.stat.exists  
+
+- include_tasks: tasks/update_repo.yml
+
+
+- name: Check if HH-search is already installed
+  ansible.builtin.stat:
+    path: "{{ hh_suite_dir }}"
+  register: hh_suite_installation
+
+- name: Install HH-suite
+  include_tasks: tasks/install_hh_suite.yml
+  when: not hh_suite_installation.stat.exists
+
+- name: Check if S4pred is already installed
+  ansible.builtin.stat:
+    path: "{{ s4pred_dir }}"
+  register: s4pred_installation
+
+- name: Install S4pred
+  include_tasks: tasks/install_s4pred.yml
+  when: not s4pred_installation.stat.exists
+

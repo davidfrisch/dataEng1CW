@@ -1,0 +1,10 @@
+---
+ansible_python_interpreter: /usr/bin/python3.11
+my_region: eu-west-2
+git_repo: git@github.com:davidfrisch/dataEng1CW.git
+repo_dir: /mnt/data/dataEng1CW
+hh_suite_dir: /mnt/data/programs/hh-suite
+hh_suite_file: hhsuite-3.3.0-AVX2-Linux.tar.gz
+hh_suite_url: https://github.com/soedinglab/hh-suite/releases/download/v3.3.0/hhsuite-3.3.0-AVX2-Linux.tar.gz
+# s4pred vars
+s4pred_dir: /mnt/data/programs/s4pred

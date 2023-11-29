@@ -1,106 +1,28 @@
-- name: Main Playbook
-  hosts: clusters
+---
+
+- name: Master Playbook
+  hosts: client
   become: true
-  vars:
-    my_region: eu-west-2
-    git_repo: git@github.com:davidfrisch/dataEng1CW.git
-    repo_dir: /mnt/data/dataEng1CW
-    ansible_python_interpreter: /usr/bin/python3.11
-    # hh_suite vars
-    hh_suite_dir: /mnt/data/programs/hh-suite
-    hh_suite_file: hhsuite-3.3.0-AVX2-Linux.tar.gz
-    hh_suite_url: https://github.com/soedinglab/hh-suite/releases/download/v3.3.0/hhsuite-3.3.0-AVX2-Linux.tar.gz
-    # s4pred vars
-    s4pred_dir: /mnt/data/programs/s4pred
-
-
-    ###
-  module_defaults:
-    community.aws.ec2_instance_info:
-      region: '{{ my_region }}'
-    amazon.aws.ec2_vpc_net_info:
-      region: '{{ my_region }}'
-    amazon.aws.ec2_vol:
-      region: '{{ my_region }}'
-
 
   tasks:
-
-    - name: Check if the /dev/nvme1n1p1 directory exists
-      stat:
-        path: /mnt/data
-      register: mnt_data_dir
-
-    - name: Echo the result
-      debug:
-        msg: "{{ mnt_data_dir.stat.exists }}"
-      when: not mnt_data_dir.stat.exists
-      
-    - include_tasks: tasks/partition_mount_disk.yml
-      when: not mnt_data_dir.stat.exists
-
-    - name: Check if Python 3.11 is already installed
-      ansible.builtin.stat:
-        path: /usr/local/bin/python3.11
-      register: python_installation
-
-    - name: Install Python 3.11
-      include_tasks: tasks/install_python311.yml
-      when: not python_installation.stat.exists 
-    
-    - name: Add spark role
+    - name: Include common role
       import_role:
-        name: spark_role
+        name: common
     
-    - name: Check if Docker is already installed
-      ansible.builtin.stat:
-        path: /usr/bin/docker
-      register: docker_installation
+    - name: Include master role
+      import_role:
+        name: master
 
-    - name: Install Docker
-      include_tasks: tasks/install_docker.yml
-      when: not docker_installation.stat.exists
+- name: Cluster Playbook
+  hosts: clusters
+  become: true
+
+  tasks:
+    - name: Include common role
+      import_role:
+        name: common
     
-    - name: Check if Repo is already installed
-      ansible.builtin.stat:
-        path: "{{ repo_dir }}"
-      register: repo_installation
+    - name: Include cluster role
+      import_role:
+        name: cluster
 
-    - name: Install Repo
-      include_tasks: tasks/install_repo.yml
-      when: not repo_installation.stat.exists  
-
-    - include_tasks: tasks/update_repo.yml
-    
-    # # TODO role for client
-    # # - include_tasks: tasks/download_pdb70.yml
-
-    - name: Check if HH-search is already installed
-      ansible.builtin.stat:
-        path: "{{ hh_suite_dir }}"
-      register: hh_suite_installation
-    
-    - name: Install HH-suite
-      include_tasks: tasks/install_hh_suite.yml
-      when: not hh_suite_installation.stat.exists
-    
-
-    - name: Check if S4pred is already installed
-      ansible.builtin.stat:
-        path: "{{ s4pred_dir }}"
-      register: s4pred_installation
-
-    - name: Install S4pred
-      include_tasks: tasks/install_s4pred.yml
-      when: not s4pred_installation.stat.exists
-
-    # Check if pdb70 is already downloaded
-    - name: Check if pdb70 is already downloaded
-      ansible.builtin.stat:
-        path: /mnt/data/pdb70
-      register: pdb70_installation
-
-    - name: Copy pdb70 from client
-      include_tasks: tasks/send_pdb70_from_client.yml
-      when: not pdb70_installation.stat.exists
-    
