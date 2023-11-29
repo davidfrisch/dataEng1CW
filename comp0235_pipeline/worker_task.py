@@ -1,6 +1,8 @@
 import sys
+import os
 from botocore.exceptions import ClientError
-from constants import PYTHON3_PATH, HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, SRC_DIR
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from comp0235_pipeline.constants import PYTHON3_PATH, HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, SRC_DIR
 from subprocess import Popen, PIPE
 import boto3
 

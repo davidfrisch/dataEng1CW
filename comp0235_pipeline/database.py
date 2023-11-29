@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
-from models.protein_result import ProteinResults
-from models.proteome import Proteomes
+from comp0235_pipeline.models.protein_result import ProteinResults
+from comp0235_pipeline.models.proteome import Proteomes
 # psql -U postgres -W -h localhost -c "CREATE DATABASE proteomics;"
 # Replace placeholders with your PostgreSQL credentials
 

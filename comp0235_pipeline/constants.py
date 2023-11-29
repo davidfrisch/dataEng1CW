@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))+ "/../"
-SRC_DIR = ROOT_DIR + "src/"
+SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 
 PYTHON3_PATH = os.getenv('PYTHON3_PATH')
 HH_SUITE__BIN_PATH = os.getenv('HH_SUITE__BIN_PATH')

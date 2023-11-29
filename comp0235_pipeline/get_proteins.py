@@ -1,5 +1,8 @@
-from database import create_session
-from models.proteome import Proteomes
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from comp0235_pipeline.database import create_session
+from comp0235_pipeline.models.proteome import Proteomes
 import argparse
 
 

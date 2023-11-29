@@ -9,3 +9,5 @@ tmp
 *.csv
 __pycache__
 .env
+*.egg-info
+build

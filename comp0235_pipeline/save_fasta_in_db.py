@@ -1,7 +1,9 @@
-from models.proteome import Proteomes
-from database import create_session
 from Bio import SeqIO
 import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from comp0235_pipeline.database import create_session
+from comp0235_pipeline.models.proteome import Proteomes
 
 def save_fasta_in_db(fasta_file):
     session = create_session()

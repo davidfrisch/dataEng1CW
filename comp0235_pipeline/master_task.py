@@ -1,7 +1,9 @@
 import csv
 import sys
+import os
 import boto3
-from constants import ROOT_DIR
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from comp0235_pipeline.constants import ROOT_DIR
 
 def merge_results(bucket, run_id):
     """
