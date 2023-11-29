@@ -9,3 +9,12 @@ hh_suite_file: hhsuite-3.3.0-AVX2-Linux.tar.gz
 hh_suite_url: https://github.com/soedinglab/hh-suite/releases/download/v3.3.0/hhsuite-3.3.0-AVX2-Linux.tar.gz
 # s4pred vars
 s4pred_dir: /mnt/data/programs/s4pred
+
+# java version
+java_package: java-1.8.0-openjdk
+
+# vars file for spark
+spark_download_url: https://dlcdn.apache.org/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz
+spark_folder_name: spark-3.5.0-bin-hadoop3
+spark_download_dest: /opt/spark.tgz
+spark_install_dir: /opt
