@@ -1,31 +1,31 @@
 ---
 
-- name: Master Playbook
-  hosts: client
-  become: true
+# - name: Master Playbook
+#   hosts: client
+#   become: true
 
-  tasks:
-    - include_vars: vars.yml
-    - name: Include common role
-      import_role:
-        name: common
+#   tasks:
+    # - include_vars: vars.yml
+    # - name: Include common role
+    #   import_role:
+    #     name: common
     
-    - name: Include master role
-      import_role:
-        name: master
+    # - name: Include master role
+    #   import_role:
+    #     name: master
 
-    - name: Echo spark master that will be used
-      debug:
-        msg: "Spark master is spark://{{ groups['client'][0] }}:7077"
+    # - name: Echo spark master that will be used
+    #   debug:
+    #     msg: "Spark master is spark://{{ groups['client'][0] }}:7077"
 
-    - name: Set spark_home from $SPARK_HOME
-      set_fact:
-        spark_home: "{{ lookup('env', 'SPARK_HOME') }}"
-      register: spark_home
+    # - name: Set spark_home from $SPARK_HOME
+    #   set_fact:
+    #     spark_home: "{{ lookup('env', 'SPARK_HOME') }}"
+    #   register: spark_home
 
-    - name: Start master 
-      command: "{{ spark_install_dir }}/spark/sbin/start-master.sh -h {{ groups['client'][0] }}"
-      when: spark_home is defined
+    # - name: Start master 
+    #   command: "{{ spark_install_dir }}/spark/sbin/start-master.sh -h {{ groups['client'][0] }}"
+    #   when: spark_home is defined
 
 - name: Cluster Playbook
   hosts: clusters

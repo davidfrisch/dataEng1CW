@@ -4,7 +4,7 @@ import argparse
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from comp0235_pipeline.constants import BUCKET_NAME, SPARK_MASTER_URL
+from pipeline.constants import BUCKET_NAME, SPARK_MASTER_URL
 
 def argparser():
     """

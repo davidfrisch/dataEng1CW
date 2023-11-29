@@ -5,9 +5,9 @@ from pyspark.sql import SparkSession
 from Bio import SeqIO
 from pipeline_argparser import argparser
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from comp0235_pipeline.constants import HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR
-from comp0235_pipeline.worker_task import run_s4pred, read_horiz, run_hhsearch, run_parser, upload_file_to_s3
-from comp0235_pipeline.master_task import merge_results, write_best_hits, write_profile_csv
+from pipeline.constants import HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR
+from pipeline.worker_task import run_s4pred, read_horiz, run_hhsearch, run_parser, upload_file_to_s3
+from pipeline.master_task import merge_results, write_best_hits, write_profile_csv
 
 
 

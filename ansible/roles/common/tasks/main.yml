@@ -42,7 +42,6 @@
 
 - include_tasks: tasks/update_repo.yml
 
-
 - name: Check if HH-search is already installed
   ansible.builtin.stat:
     path: "{{ hh_suite_dir }}"
