@@ -1,13 +1,13 @@
 ---
 # tasks file for common
 
-- name: Check if the /dev/nvme1n1p1 directory exists
-  ansible.builtin.stat:
-    path: /mnt/data
-  register: mnt_data_dir
+- name: Check if /mnt/data is already mounted
+  command: mount
+  register: mount_info
   
-- include_tasks: tasks/partition_mount_disk.yml
-  when: not mnt_data_dir.stat.exists
+- name: Partition and mount the disk
+  include_tasks: tasks/partition_mount_disk.yml
+  when: "'/mnt/data' not in mount_info.stdout"
 
 - name: Check if Python 3.11 is already installed
   ansible.builtin.stat:

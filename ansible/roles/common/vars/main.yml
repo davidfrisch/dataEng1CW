@@ -1,5 +1,4 @@
 ---
-ansible_python_interpreter: /usr/bin/python3.11
 my_region: eu-west-2
 git_repo: git@github.com:davidfrisch/dataEng1CW.git
 repo_dir: /mnt/data/dataEng1CW
