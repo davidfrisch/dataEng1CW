@@ -1,10 +1,10 @@
 import os
 import sys
 from dotenv import load_dotenv
-load_dotenv()
-
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))+ "/../"
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))+ "/.."
 SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+#TODO change this to the correct path
+load_dotenv(f"/mnt/data/dataEng1CW/pipeline/.env")
 
 PYTHON3_PATH = os.getenv('PYTHON3_PATH')
 HH_SUITE__BIN_PATH = os.getenv('HH_SUITE__BIN_PATH')

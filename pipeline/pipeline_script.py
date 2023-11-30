@@ -8,14 +8,27 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR
 from pipeline.worker_task import run_s4pred, read_horiz, run_hhsearch, run_parser, upload_file_to_s3
 from pipeline.master_task import merge_results, write_best_hits, write_profile_csv
-
+import zipfile
 
 
 
 def zip_module():
-  # TODO zip module
-  pass
+    """
+    Function to zip the module for spark to use
+    """
+    path_to_zip = os.path.join(os.path.dirname(__file__), "..", "pipeline.zip")
+    zipf = zipfile.ZipFile(path_to_zip, 'w', zipfile.ZIP_DEFLATED)
+    exclude_folders = ['venv', 'ansible']
 
+    for root, dirs, files in os.walk(os.path.join(os.path.dirname(__file__), "..")):
+        dirs[:] = [d for d in dirs if d not in exclude_folders]
+
+        for file in files:
+            if file.endswith('.py') or file.endswith('.env'):
+                zipf.write(os.path.join(root, file), arcname=os.path.relpath(os.path.join(root, file), start=os.path.join(os.path.dirname(__file__), "..")))
+    zipf.close()
+
+    return path_to_zip
 
 
 """
@@ -96,9 +109,11 @@ if __name__ == "__main__":
         sys.exit(1)
     
     spark = SparkSession.builder.appName("pdb_analyse").master(master_url).getOrCreate()
-
-    if not args.run_id:
-        os.makedirs(f"{ROOT_DIR}/output/{run_id}")
+    path_to_pipeline_zip = zip_module()
+    spark.sparkContext.addPyFile(path_to_pipeline_zip)
+  
+    
+    os.makedirs(f"{ROOT_DIR}/output/{run_id}", exist_ok=True)
     
     print("SPARK SESSION STARTED on ", master_url)
     print("START RUN ID: ", run_id)

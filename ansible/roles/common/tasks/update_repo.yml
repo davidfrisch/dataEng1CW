@@ -6,12 +6,12 @@
     dest: "{{ repo_dir }}"
     accept_hostkey: yes
     key_file: /home/ec2-user/.ssh/david_student_key
-    force: true
+
 
 - name: install requirements
   shell: |
     cd {{ repo_dir }} && \
     source venv/bin/activate && \
+    pip install pip --upgrade && \
     cd {{ repo_dir }}/pipeline && \
-    TMPDIR=/mnt/data pip install . --no-cache --cache-dir=/mnt/data/pip_cache
-    TMPDIR=/mnt/data pip install -r ../requirements.txt --no-cache --cache-dir=/mnt/data/pip_cache 
+    TMPDIR=/mnt/data pip install . --no-cache --cache-dir=/mnt/data/pip_cache --no-cache

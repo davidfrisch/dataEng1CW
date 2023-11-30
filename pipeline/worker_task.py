@@ -3,6 +3,7 @@ import os
 from botocore.exceptions import ClientError
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import PYTHON3_PATH, HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, SRC_DIR
+from pipeline.worker_results_parser import run_hhr_parser
 from subprocess import Popen, PIPE
 import boto3
 
@@ -70,11 +71,10 @@ def run_parser(hhr_file, output_file):
     """
     Run the worker_results_parser.py over the hhr file to produce the output summary
     """
-    cmd = [PYTHON3_PATH, f'{SRC_DIR}/worker_results_parser.py', '-f', hhr_file, '-o', output_file]
-    print(f'STEP 4: RUNNING PARSER: {" ".join(cmd)}')
-    p = Popen(cmd, stdin=PIPE,stdout=PIPE, stderr=PIPE)
-    out, err = p.communicate()
-    print(out.decode("utf-8"))
+
+    print(f'STEP 4: RUNNING PARSER: {hhr_file}')
+    run_hhr_parser(hhr_file, output_file)
+    print(f"STEP 4: OUTPUT FILE: {output_file}")
 
 
 def upload_file_to_s3(bucket, file_name, object_name=None):

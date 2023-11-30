@@ -6,7 +6,6 @@
 - open the ports
 - install pyspark
 - set pyspark envs
-- install python3.11
 - install and update pip3
 - git clone the project
 - create a python3.11 virtual environment

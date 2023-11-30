@@ -9,14 +9,8 @@
   include_tasks: tasks/partition_mount_disk.yml
   when: "'/mnt/data' not in mount_info.stdout"
 
-- name: Check if Python 3.11 is already installed
-  ansible.builtin.stat:
-    path: /usr/local/bin/python3.11
-  register: python_installation
-
-- name: Install Python 3.11
-  include_tasks: tasks/install_python311.yml
-  when: not python_installation.stat.exists 
+- name: Update pip
+  command: pip3 install --upgrade pip
 
 - name: Add spark role
   import_role:
