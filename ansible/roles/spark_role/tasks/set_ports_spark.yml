@@ -1,7 +1,7 @@
 ---
 
 - name: Create spark-defaults.conf from spark-defaults.conf.template
-  become: yes
+  become: true
   copy:
     src: "{{ spark_install_dir }}/spark/conf/spark-defaults.conf.template"
     dest: "{{ spark_install_dir }}/spark/conf/spark-defaults.conf"

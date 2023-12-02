@@ -1,7 +1,7 @@
 ---
 
 - name: Install Java 8
-  become: yes
+  become: true
   yum:
     name: "{{ java_package }}"
     state: present

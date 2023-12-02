@@ -1,8 +1,7 @@
 - name: Stop Spark Playbook
-  hosts: all
-  become: true
+  hosts: client
 
   tasks:
     - include_vars: vars.yml
-    - name: Stop spark
-      command: "{{ spark_install_dir}}/spark/sbin/stop-all.sh"
+    - name: Start spark master and workers set in its workers file
+      command: "{{ spark_install_dir}}/spark/sbin/start-all.sh"

@@ -13,7 +13,7 @@
     ssh-add /home/ec2-user/.ssh/david_student_key
 
 - name: Copy pdb70 from client to clusters
-  become: yes
+  become: true
   ansible.posix.synchronize:
     src: /mnt/data/pdb70
     dest: /mnt/data/

@@ -1,0 +1,19 @@
+- name: Create workers file
+  become: true
+  copy:
+    src: "{{ spark_install_dir }}/spark/conf/workers.template"
+    dest: "{{ spark_install_dir }}/spark/conf/workers"
+    owner: "{{ spark_user }}"
+    group: "{{ spark_group }}"
+    mode: 0644
+
+- name: Add workers list
+  lineinfile:
+    dest: "{{ spark_install_dir }}/spark/conf/workers"
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - {{ spark_worker_1 }}
+    - {{ spark_worker_2 }}
+    - {{ spark_worker_3 }}
+    - {{ spark_worker_4 }}

@@ -26,7 +26,7 @@
     python3 -m venv venv
 
 - name: Change ownership of repo
-  become: yes
+  become: true
   file:
     path: "{{ repo_dir }}"
     owner: ec2-user

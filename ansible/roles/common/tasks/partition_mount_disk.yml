@@ -1,7 +1,7 @@
 
 
 - name: Create a new ext4 primary partition
-  become: yes
+  become: true
   community.general.parted:
     device: /dev/nvme1n1
     state: present
@@ -10,7 +10,7 @@
     label: gpt
 
 - name: Create /mnt/data directory
-  become: yes
+  become: true
   file:
     path: /mnt/data
     state: directory
