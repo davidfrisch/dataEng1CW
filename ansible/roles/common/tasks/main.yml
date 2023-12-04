@@ -9,8 +9,13 @@
   include_tasks: tasks/partition_mount_disk.yml
   when: "'/mnt/data' not in mount_info.stdout"
 
+- name: install pip3
+  dnf:
+    name: python3-pip
+    state: present
+
 - name: Update pip
-  command: pip3 install --upgrade pip
+  command:  pip3 install --upgrade pip
 
 - name: Add spark role
   import_role:

@@ -1,12 +1,12 @@
 ---
 
 - name: Create spark-defaults.conf from spark-defaults.conf.template
-  become: true
   copy:
     src: "{{ spark_install_dir }}/spark/conf/spark-defaults.conf.template"
     dest: "{{ spark_install_dir }}/spark/conf/spark-defaults.conf"
-    owner: root
-    group: root
+    remote_src: yes
+    owner: "{{ spark_user }}"
+    group: "{{ spark_group }}"
     mode: 0644
 
 - name: Set spark driver port 40423

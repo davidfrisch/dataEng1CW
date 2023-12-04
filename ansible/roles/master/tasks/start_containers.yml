@@ -1,0 +1,10 @@
+- name: Start Docker containers (Postgres)
+  cmd: docker-compose up -d
+
+- name: Log docker containres
+  cmd: docker ps
+  register: postgres_container_status
+
+- name: Echo docker container status
+  ansible.builtin.debug:
+    msg: "{{ postgres_container_status.stdout_lines }}"

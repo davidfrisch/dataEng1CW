@@ -8,3 +8,12 @@
 - name: Download pdb70
   include_tasks: tasks/download_pdb70.yml
   when: not pdb70_installation.stat.exists
+
+- name: ssh to workers
+  include_tasks: tasks/ssh_to_workers.yml
+
+- name: Add worker list to spark-env.sh
+  include_tasks: tasks/set_spark_envs.yml
+
+- name: Start docker containers
+  include_tasks: tasks/start_docker_containers.yml

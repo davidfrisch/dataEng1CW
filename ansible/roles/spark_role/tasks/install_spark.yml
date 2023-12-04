@@ -2,7 +2,7 @@
 
 - name: Verify if spark is already installed
   stat:
-    path: "{{ spark_install_dir }}/bin/spark-shell"
+    path: "{{ spark_install_dir }}/spark/bin/spark-shell"
   register: spark_installation
 
 - name: Log spark installation status
@@ -19,6 +19,27 @@
     validate_certs: no
   when: spark_installation.stat.exists == False
 
+- name: Extract Spark
+  become: true
+  unarchive:
+    src: "{{ spark_download_dest }}"
+    dest: "{{ spark_install_dir }}"
+    remote_src: yes
+    creates: "{{ spark_install_dir }}/spark/bin/spark-shell"
+
+- name: Remove Spark tarball if it exists
+  become: true
+  file:
+    path: "{{ spark_download_dest }}"
+    state: absent
+  when: spark_installation.stat.exists == False
+
+
+- name: Change spark name folder
+  become: true
+  command: mv {{ spark_install_dir }}/{{ spark_folder_name }} {{ spark_install_dir }}/spark/
+  when: spark_installation.stat.exists == False
+
 
 - name: Change owner of Spark installation directory
   become: true
@@ -28,27 +49,8 @@
     group: "{{ spark_group }}"
     mode: 0755
     recurse: yes
-
-- name: Extract Spark
-  become: true
-  unarchive:
-    src: "{{ spark_download_dest }}"
-    dest: "{{ spark_install_dir }}"
-    remote_src: yes
-    creates: "{{ spark_install_dir }}/bin/spark-shell"
-
-- name: Remove Spark tarball if it exists
-  become: true
-  file:
-    path: "{{ spark_download_dest }}"
-    state: absent
   when: spark_installation.stat.exists == False
 
-- name: Change spark name folder
-  become: true
-  command: mv {{ spark_install_dir }}/{{ spark_folder_name }} {{ spark_install_dir }}/spark
-  when: spark_installation.stat.exists == False
-  
 - name: Set Spark environment variables in ~/.bashrc
   lineinfile:
     dest: ~/.bashrc

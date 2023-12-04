@@ -6,11 +6,24 @@
     group: ec2-user
     mode: 0600
 
-
 - name: wake up ssh-agent and add david_student_key
   shell: |
     eval `ssh-agent -s`
     ssh-add /home/ec2-user/.ssh/david_student_key
+
+
+- name: read ~/.bashrc
+  shell: cat ~/.bashrc
+  register: bashrc_contents
+
+- name: Add to .bashrc ssh-add
+  when: user_accts.stdout.find("ssh-add") == -1
+  lineinfile:
+    path: ~/.bashrc
+    line: |
+      eval `ssh-agent -s`
+      ssh-add ~/.ssh/david_student_key
+    create: yes
 
 - name: clone git repo
   git:
@@ -18,7 +31,6 @@
     dest: "{{ repo_dir }}"
     accept_hostkey: yes
     key_file: /home/ec2-user/.ssh/david_student_key
-
 
 - name: create environment
   shell: |

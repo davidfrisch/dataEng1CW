@@ -1,0 +1,32 @@
+
+- name: Give private key to master
+  copy:
+    src: "{{ ssh_private_key }}"
+    dest: "~/.ssh/david_student_key"
+    owner: "{{ spark_user }}"
+    group: "{{ spark_group }}"
+    mode: 0600
+
+- name: Give public key to master
+  copy:
+    src: "{{ ssh_private_key }}.pub"
+    dest: "~/.ssh/david_student_key.pub"
+    owner: "{{ spark_user }}"
+    group: "{{ spark_group }}"
+    mode: 0600
+
+- name: wake up ssh-agent and add david_student_key
+  shell: |
+    eval `ssh-agent -s`
+    ssh-add /home/ec2-user/.ssh/david_student_key
+
+
+- name: SSH to workers and say yes to add them to known hosts
+  become: true
+  command: ssh -o StrictHostKeyChecking=no -i ~/.ssh/david_student_key {{ item }} "echo 'yes' > /dev/null"
+  with_items:
+    - "{{ spark_worker_1 }}"
+    - "{{ spark_worker_2 }}"
+    - "{{ spark_worker_3 }}"
+    - "{{ spark_worker_4 }}"
+
