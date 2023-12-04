@@ -1,4 +1,4 @@
-- name: Stop Spark Playbook
+- name: Start Spark Playbook
   hosts: client
 
   tasks:
