@@ -11,6 +11,8 @@ setup(
         'biopython',
         'boto3',
         'sqlalchemy',
+        'psycopg2-binary',
+        'sqlalchemy_utils',
         'python-dotenv',
         'pyspark',
         'torch',

@@ -10,7 +10,6 @@ def save_fasta_in_db(fasta_file):
     for record in SeqIO.parse(fasta_file, "fasta"):
         proteome = Proteomes(
             id=record.id,
-            description=record.description,
             sequence=str(record.seq)
         )
         # check if the record exists
@@ -23,7 +22,7 @@ def save_fasta_in_db(fasta_file):
 
     session.commit()
     session.close()
-    print("Saved all records in the database")
+    print("Success, closing session")
 
 if __name__ == "__main__":
     args = sys.argv[1:]

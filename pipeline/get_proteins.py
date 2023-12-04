@@ -42,17 +42,19 @@ if __name__ == "__main__":
         print("No ids in input")
         exit(0)
 
-    proteins = get_proteins(list_ids)
+    proteins_found = get_proteins(list_ids)
 
-    if not proteins:
+    if not proteins_found:
         print("No proteins found")
         exit(0)
 
 
     output_file = "./proteins.csv" if not args.output else args.output    
     with open(output_file, "w") as f:
-        f.write("id,description,sequence\n")
-        for protein in proteins:
-            f.write(f"{protein.id},{protein.description},{protein.sequence}\n")
+        f.write("id,sequence\n")
+        for protein in proteins_found:
+            f.write(f"{protein.id},{protein.sequence}\n")
+    
+    print(f"{len(proteins_found)} / {len(list_ids)} Proteins saved in {output_file}")
 
 

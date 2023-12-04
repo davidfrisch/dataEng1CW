@@ -1,6 +1,11 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from sqlalchemy import create_engine
-from comp0235_pipeline.models.protein_result import ProteinResults
-from comp0235_pipeline.models.proteome import Proteomes
+from sqlalchemy_utils import create_database, database_exists
+from pipeline.models.protein_result import ProteinResults
+from pipeline.models.proteome import Proteomes
+from sqlalchemy.orm import sessionmaker
 # psql -U postgres -W -h localhost -c "CREATE DATABASE proteomics;"
 # Replace placeholders with your PostgreSQL credentials
 
@@ -9,7 +14,6 @@ def get_engine():
     engine = create_engine(db_url)
     return engine
 # connect to the database
-from sqlalchemy.orm import sessionmaker
 
 def create_session():
     engine = get_engine()
@@ -18,10 +22,15 @@ def create_session():
     return session
 
 engine = get_engine()
+if not database_exists(engine.url):
+    print("Creating database {}".format(engine.url))
+    create_database(engine.url)
+
 if engine.connect().closed:
     print("Not connected to the database")
 else:
     print("Connected to the database")
+
 
 # create the tables if they don't exist
 ProteinResults.__table__.create(engine, checkfirst=True)
