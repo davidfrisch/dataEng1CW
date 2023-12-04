@@ -1,5 +1,13 @@
 ---
 
+- name: Change owner of repo dir
+  file:
+    path: "{{ repo_dir }}"
+    owner: ec2-user
+    group: ec2-user
+    state: directory
+    recurse: yes
+
 - name: Update git repo
   git:
     repo: '{{ git_repo }}'
@@ -7,6 +15,9 @@
     accept_hostkey: yes
     key_file: /home/ec2-user/.ssh/david_student_key
 
+- name: Update env vars 
+  shell: |
+    cd {{ repo_dir }} && ./scripts/setup_local_env.sh
 
 - name: install requirements
   shell: |
