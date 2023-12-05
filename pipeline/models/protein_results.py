@@ -6,7 +6,7 @@ Base = declarative_base()
 class ProteinResults(Base):
     __tablename__ = 'protein_results'
     run_id = Column(String, primary_key=True)
-    query_id = Column(Integer, primary_key=True)
+    query_id = Column(String, primary_key=True)
     best_hit = Column(String)
     best_evalue = Column(Float)
     best_score = Column(Float)

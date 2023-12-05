@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, database_exists
-from pipeline.models.protein_result import ProteinResults
+from pipeline.models.protein_results import ProteinResults
 from pipeline.models.proteome import Proteomes
 from sqlalchemy.orm import sessionmaker
 # psql -U postgres -W -h localhost -c "CREATE DATABASE proteomics;"

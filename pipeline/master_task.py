@@ -4,6 +4,16 @@ import os
 import boto3
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import ROOT_DIR
+from pipeline.database import create_session
+from pipeline.models.protein_results import ProteinResults
+# Define the indices of the columns in the results file
+QUERY_ID_INDEX = 0
+BEST_HIT_INDEX = 1
+BEST_EVALUE_INDEX = 2
+BEST_SCORE_INDEX = 3
+SCORE_MEAN_INDEX = 4
+SCORE_STD_INDEX = 5
+SCORE_GMEAN_INDEX = 6
 
 def merge_results(bucket, run_id):
     """
@@ -91,4 +101,43 @@ def write_profile_csv(merged_results_csv, output_file):
         fh_out.write("score_std,score_gmean\n")
         fh_out.write(f"{sum(score_std)/len(score_std)},{sum(score_gmean)/len(score_gmean)}\n")
 
-  
+def save_results_to_db(merged_results_csv, run_id):
+    """
+    Function to save the results to the database
+    """
+    print("SAVING RESULTS TO DATABASE")
+    session = None
+    try:
+        session = create_session()
+        csv_reader = csv.reader(open(merged_results_csv, "r"), delimiter=",")
+        header = next(csv_reader)
+        for row in csv_reader:
+            # Create a new protein_result object
+            for i in range(2, len(row)):
+                if row[i] == 'nan':
+                    row[i] = None
+                else:
+                    row[i] = float(row[i])
+
+            protein_result = ProteinResults(
+            run_id=run_id,
+            query_id=row[QUERY_ID_INDEX],
+            best_hit=row[BEST_HIT_INDEX],
+            best_evalue=row[BEST_EVALUE_INDEX],
+            best_score=row[BEST_SCORE_INDEX],
+            score_mean=row[SCORE_MEAN_INDEX],
+            score_std=row[SCORE_STD_INDEX],
+            score_gmean=row[SCORE_GMEAN_INDEX]
+            )
+            # Add the object to the session
+            session.add(protein_result)
+        
+        session.commit()
+        session.close()
+    except Exception as e:
+        print("Error while saving results to database: ", e)
+        if session:
+            session.rollback()
+            
+        sys.exit(1)
+    print("RESULTS SAVED TO DATABASE")

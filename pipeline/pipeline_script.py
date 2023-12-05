@@ -7,7 +7,7 @@ from pipeline_argparser import argparser
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR
 from pipeline.worker_task import run_s4pred, read_horiz, run_hhsearch, run_parser, upload_file_to_s3
-from pipeline.master_task import merge_results, write_best_hits, write_profile_csv
+from pipeline.master_task import merge_results, write_best_hits, write_profile_csv, save_results_to_db
 import zipfile
 
 
@@ -127,4 +127,5 @@ if __name__ == "__main__":
     merge_results(bucket, run_id)
     write_best_hits(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", f"{ROOT_DIR}/output/{run_id}/best_hits_output.csv")
     write_profile_csv(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", f"{ROOT_DIR}/output/{run_id}/profile_output.csv")
+    save_results_to_db(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", run_id)
     spark.stop()
