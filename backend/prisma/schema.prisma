@@ -24,3 +24,12 @@ model proteomes {
   id       String  @id @db.VarChar
   sequence String? @db.VarChar
 }
+
+model pipeline_run_summary {
+  run_id         String  @id @db.VarChar
+  execution_time Float?
+  score_std      Float?
+  score_gmean    Float?
+  date_created   String? @db.VarChar
+  author         String? @db.VarChar
+}

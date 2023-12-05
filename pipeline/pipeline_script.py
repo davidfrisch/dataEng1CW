@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 import os
 import sys
+import time
 from pyspark.sql import SparkSession
 from Bio import SeqIO
 from pipeline_argparser import argparser
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR
 from pipeline.worker_task import run_s4pred, read_horiz, run_hhsearch, run_parser, upload_file_to_s3
-from pipeline.master_task import merge_results, write_best_hits, write_profile_csv, save_results_to_db
+from pipeline.master_task import merge_results, write_best_hits, write_profile_csv, save_results_to_db, get_avg_score_gmean, get_avg_score_std
 import zipfile
 
 
@@ -117,6 +118,7 @@ if __name__ == "__main__":
     
     print("SPARK SESSION STARTED on ", master_url)
     print("START RUN ID: ", run_id)
+    start_time = time.time()
 
     sequences = read_input(args.input_file)
     sequence_list = list(sequences.items())
@@ -126,6 +128,9 @@ if __name__ == "__main__":
 
     merge_results(bucket, run_id)
     write_best_hits(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", f"{ROOT_DIR}/output/{run_id}/best_hits_output.csv")
-    write_profile_csv(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", f"{ROOT_DIR}/output/{run_id}/profile_output.csv")
-    save_results_to_db(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", run_id)
+    avg_score_std = get_avg_score_std(f"{ROOT_DIR}/output/{run_id}/merge_result.csv")
+    avg_score_gmean = get_avg_score_gmean(f"{ROOT_DIR}/output/{run_id}/merge_result.csv")
+    write_profile_csv(avg_score_std, avg_score_gmean,  f"{ROOT_DIR}/output/{run_id}/profile_output.csv")
+    total_time = time.time() - start_time
+    save_results_to_db(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", avg_score_std, avg_score_gmean, total_time, run_id)
     spark.stop()

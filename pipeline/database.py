@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, database_exists
 from pipeline.models.protein_results import ProteinResults
 from pipeline.models.proteome import Proteomes
+from pipeline.models.pipeline_run_summary import PipelineRunSummary
 from sqlalchemy.orm import sessionmaker
 # psql -U postgres -W -h localhost -c "CREATE DATABASE proteomics;"
 # Replace placeholders with your PostgreSQL credentials
@@ -35,3 +36,5 @@ else:
 # create the tables if they don't exist
 ProteinResults.__table__.create(engine, checkfirst=True)
 Proteomes.__table__.create(engine, checkfirst=True)
+PipelineRunSummary.__table__.create(engine, checkfirst=True)
+print("Tables created")

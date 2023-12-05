@@ -2,10 +2,12 @@ import csv
 import sys
 import os
 import boto3
+from datetime import datetime
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import ROOT_DIR
 from pipeline.database import create_session
 from pipeline.models.protein_results import ProteinResults
+from pipeline.models.pipeline_run_summary import PipelineRunSummary
 # Define the indices of the columns in the results file
 QUERY_ID_INDEX = 0
 BEST_HIT_INDEX = 1
@@ -54,7 +56,7 @@ def write_best_hits(merged_results_csv, output_file):
 
     if not (isinstance(query_id_index, int) and isinstance(best_hit_index, int)):
         print("Cannot find query_id and best_hit columns in the results file")
-        sys.exit(1)
+        raise Exception("Cannot find query_id and best_hit columns in the results file")
 
     # Iterate over the rows and extract query_id and best_hit values
     best_hits = []
@@ -67,48 +69,96 @@ def write_best_hits(merged_results_csv, output_file):
         for best_hit in best_hits:
             fh_out.write(f"{best_hit[0]},{best_hit[1]}\n")
 
-def write_profile_csv(merged_results_csv, output_file):
+
+def get_avg_score_std(merged_results_csv):
     """
-    Function to write the mean Standard Deviation and mean Geometric means for all the sequences 
+    Function to get the average score standard deviation
     """
     csv_reader = csv.reader(open(merged_results_csv, "r"), delimiter=",")
     header = next(csv_reader)
 
     score_std_index = int(header.index('score_std'))
-    score_gmean_index = int(header.index('score_gmean'))
 
-    if not (isinstance(score_std_index, int) and isinstance(score_gmean_index, int)):
-        print("Cannot find score_std and score_gmean columns in the results file")
-        sys.exit(1)
+    if not isinstance(score_std_index, int):
+        print("Cannot find score_std column in the results file")
+        raise Exception("Cannot find score_std column in the results file")
     
     score_std = []
-    score_gmean = []
     for row in csv_reader:
         row_std = str(row[score_std_index])
-        row_gmean = str(row[score_gmean_index])
-
-        # check if the values are not NaN
+        # check if the value is not NaN
         if row_std.lower() != 'nan':
             score_std.append(float(row_std))  
-        if row_gmean.lower() != 'nan':
-            score_gmean.append(float(row_gmean))
 
-    if len(score_std) == 0 or len(score_gmean) == 0:
+    if len(score_std) == 0:
         print("No valid values found in the results file")
-        sys.exit(1)
+        raise Exception("No valid values found in the results file")
 
+    avg_score_std = sum(score_std)/len(score_std)
+    return avg_score_std
+
+
+def get_avg_score_gmean(merged_results_csv):
+    """
+    Function to get the average score geometric mean
+    """
+    csv_reader = csv.reader(open(merged_results_csv, "r"), delimiter=",")
+    header = next(csv_reader)
+
+    score_gmean_index = int(header.index('score_gmean'))
+
+    if not isinstance(score_gmean_index, int):
+        print("Cannot find score_gmean column in the results file")
+        raise Exception("Cannot find score_gmean column in the results file")
+    
+    score_gmean = []
+    for row in csv_reader:
+        row_gmean = str(row[score_gmean_index])
+        # check if the value is not NaN
+        if row_gmean.lower() != 'nan':
+            score_gmean.append(float(row_gmean))  
+
+    if len(score_gmean) == 0:
+        print("No valid values found in the results file")
+        raise Exception("No valid values found in the results file")
+
+    avg_score_gmean = sum(score_gmean)/len(score_gmean)
+    return avg_score_gmean
+
+
+def write_profile_csv(avg_score_std, avg_score_gmean, output_file):
+    """
+    Function to write the mean Standard Deviation and mean Geometric means for all the sequences 
+    """   
     with open(output_file, "w") as fh_out:
         fh_out.write("score_std,score_gmean\n")
-        fh_out.write(f"{sum(score_std)/len(score_std)},{sum(score_gmean)/len(score_gmean)}\n")
+        fh_out.write(f"{avg_score_std},{avg_score_gmean}\n")
+    
 
-def save_results_to_db(merged_results_csv, run_id):
+def save_results_to_db(merged_results_csv, avg_score_std, avg_score_gmean, total_time, run_id):
     """
     Function to save the results to the database
     """
     print("SAVING RESULTS TO DATABASE")
     session = None
+    whoami = os.getenv('USER')
     try:
         session = create_session()
+
+        # Create a new pipeline_run_summary object
+        pipeline_run_summary = PipelineRunSummary(
+            run_id=run_id,
+            execution_time=total_time,
+            score_std=avg_score_std,
+            score_gmean=avg_score_gmean,
+            date_created=datetime.now(),
+            author=whoami
+        )
+
+        session.add(pipeline_run_summary)
+        session.commit()
+
+
         csv_reader = csv.reader(open(merged_results_csv, "r"), delimiter=",")
         header = next(csv_reader)
         for row in csv_reader:
@@ -139,5 +189,5 @@ def save_results_to_db(merged_results_csv, run_id):
         if session:
             session.rollback()
             
-        sys.exit(1)
+        raise Exception("Error while saving results to database")
     print("RESULTS SAVED TO DATABASE")

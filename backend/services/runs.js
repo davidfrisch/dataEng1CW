@@ -25,6 +25,16 @@ export default {
     return results
   },
 
+  getRunSummary: async (run_id) => {
+      const results = await prisma.pipeline_run_summary.findUnique({
+        where: {
+          run_id: run_id
+        }
+      })
+
+      return results
+  },
+
   toCSV: (proteins) => {
     const header = Object.keys(proteins[0]).join(',')
     const rows = proteins.map(row => Object.values(row).join(','))
