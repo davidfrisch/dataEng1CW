@@ -5,11 +5,10 @@ import { SHARE_DIR } from "../constants.js";
 
 export const UploadController = {
   importFile: async (req, res) => {
-    // in FormData, the file is stored in req.files.file
-    // in FormData, the name 
+
     try {
-      const name = req.body.name;
-      // dump file to disc
+      let name = req.body.name;
+      name = name.replace(/\.[^/.]+$/, "");
       const filePathFasta = `${SHARE_DIR}/${name}_${Date.now()}.fasta`;
       const fileBuffer = Buffer.from(req.file.buffer);
       const file = fileBuffer.toString();
@@ -20,7 +19,8 @@ export const UploadController = {
         .obj(filePathFasta)
         .on("data", async function (data) {
           const { id, seq } = data;
-          proteines.push({ id, seq });
+          const simple_id = id.split(" ")[0];
+          proteines.push({ id: simple_id, seq });
         })
         .on("end", async function () {
           const protein_status = await UploadService.saveProteines(proteines);

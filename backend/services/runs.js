@@ -50,4 +50,17 @@ export default {
     const rows = proteins.map((row) => Object.values(row).join(","));
     return [header, ...rows].join("\n");
   },
+
+  getRunsByProteinId: async (protein_id) => {
+    const results = await prisma.protein_results.findMany({
+      where: {
+        query_id: protein_id,
+      },
+      select: {
+        run_id: true,
+      },
+    });
+
+    return results;
+  },
 };

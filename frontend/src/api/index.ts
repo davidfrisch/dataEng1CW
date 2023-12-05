@@ -20,7 +20,8 @@ type StartRunData = {
   process_name: string;
   fasta_file_path: string;
 };
-const startRun = (data: StartRunData) => api.post("/runs/launch_pipeline", data);
+const startRun = (data: StartRunData) =>
+  api.post("/runs/launch_pipeline", data);
 
 const runs = {
   getRuns,
@@ -35,7 +36,12 @@ const upload = (data: any) =>
     },
   });
 
+const proteins = {
+  getProtein: (id: string) => api.get(`/proteins/${id}`),
+};
+
 export default {
   runs,
   upload,
+  proteins,
 };
