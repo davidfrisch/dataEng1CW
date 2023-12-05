@@ -1,18 +1,21 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 import helmet from 'helmet';
-import { ResultsProteinsRouter } from './routes/runs.js';
+import 'dotenv/config';
+import { RunsRouter } from './routes/runs.js';
 import { UploadRouter } from './routes/upload.js';
 
 const app = express();
 app.use(cors());
 app.use(helmet());
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.use('/runs', ResultsProteinsRouter);
+app.use('/runs', RunsRouter);
 app.use('/upload', UploadRouter);
 
 app.listen(3001, () => {

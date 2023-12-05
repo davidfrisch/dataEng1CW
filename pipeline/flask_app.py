@@ -1,10 +1,13 @@
 from flask import Flask, request
+from flask_cors import CORS
 from subprocess import Popen, PIPE
 import sys
 import os
+from time import time
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import SPARK_MASTER_URL
 app = Flask(__name__)
+CORS(app, origins=['*'])
 
 @app.route('/')
 def hello_world():
@@ -25,11 +28,27 @@ def hello_world():
 
 @app.route('/launch_pipeline', methods=['POST'])
 def launch_pipeline():
-    filepath = request.form['file_path']
-    cmd = f'python3 pipeline_script.py -f {filepath} --master {SPARK_MASTER_URL}'
+    data = request.get_json()
+    filepath = data['file_path'] if 'file_path' in data else None
+    name = data['name'] if 'name' in data else None
+    run_id = name + '_' + str(int(time()))
+
+    if not os.path.exists(filepath):
+        return {'error': 'File not found'}
+
+    if not name:
+        return {'error': 'No process name provided'}
+
+    if filepath is None:
+        return {'error': 'No file path provided'}
+
+    if not filepath.endswith('.fasta'):
+        return {'error': 'File is not a fasta file'}
+
+    cmd = f'python3 pipeline_script.py -f {filepath} --master {SPARK_MASTER_URL} --run_id {run_id}'
     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
     # run in the background
-    return 'Pipeline launched'
+    return {'run_id': run_id}
     
     
 

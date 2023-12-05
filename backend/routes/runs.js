@@ -1,10 +1,12 @@
 import express from 'express'
 import { RunsController } from '../controllers/runs.js'
 
-export const ResultsProteinsRouter = express.Router()
+export const RunsRouter = express.Router()
 
-ResultsProteinsRouter.get('/', RunsController.getRuns)
+RunsRouter.get('/', RunsController.getRuns)
 
-ResultsProteinsRouter.get('/:run_id', RunsController.getRun)
+RunsRouter.get('/:run_id', RunsController.getRun)
 
-ResultsProteinsRouter.get('/:run_id/download', RunsController.downloadRun)
+RunsRouter.get('/:run_id/download', RunsController.downloadRun)
+
+RunsRouter.post('/launch_pipeline', RunsController.startRun)

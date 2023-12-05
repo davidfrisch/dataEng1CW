@@ -12,6 +12,17 @@ export const RunsController = {
     res.send({ proteins, run_summary });
   },
 
+  startRun: async (req, res) => {
+    try {
+      const { fasta_file_path, process_name } = req.body;
+      const run_id = await RunsService.startRun(fasta_file_path, process_name);
+      res.send({ run_id });
+    } catch (e) {
+      console.log(e);
+      res.status(500).send({ error: e });
+    }
+  },
+
   downloadRun: async (req, res) => {
     const run_id = req.params.run_id;
 

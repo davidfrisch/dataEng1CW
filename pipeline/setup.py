@@ -16,5 +16,7 @@ setup(
         'python-dotenv',
         'pyspark',
         'torch',
+        'flask',
+        'flask-cors',
     ]
 )

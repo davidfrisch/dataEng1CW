@@ -13,13 +13,19 @@ const getRuns = () => {
   const res = api.get("/runs");
   console.log(res);
   return res;
-
-}
+};
 const getRun = (id: string) => api.get(`/runs/${id}`);
+
+type StartRunData = {
+  process_name: string;
+  fasta_file_path: string;
+};
+const startRun = (data: StartRunData) => api.post("/runs/launch_pipeline", data);
 
 const runs = {
   getRuns,
   getRun,
+  startRun,
 };
 
 const upload = (data: any) =>
