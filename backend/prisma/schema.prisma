@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model protein_results {
+  run_id      String  @db.VarChar
+  query_id    String  @db.VarChar
+  best_hit    String? @db.VarChar
+  best_evalue Float?
+  best_score  Float?
+  score_mean  Float?
+  score_std   Float?
+  score_gmean Float?
+
+  @@id([run_id, query_id])
+}
+
+model proteomes {
+  id       String  @id @db.VarChar
+  sequence String? @db.VarChar
+}
