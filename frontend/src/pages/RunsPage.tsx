@@ -27,6 +27,8 @@ export default function RunsPage({}: Props) {
     return <div>Loading...</div>;
   }
 
+
+  console.log("runResults", runResults);
   return (
     <div>
       <h1>Run Results</h1>
@@ -37,7 +39,7 @@ export default function RunsPage({}: Props) {
           </tr>
         </thead>
         <tbody>
-          {runResults.map((runResults: any) => (
+          {runResults.length > 0 && runResults.map((runResults: any) => (
             <tr key={runResults.run_id}>
               <td>
                 <a href={`/runs/${runResults.run_id}`}>

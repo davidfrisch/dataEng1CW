@@ -9,7 +9,12 @@ export const api = axios.create({
 });
 
 /* all resquest with runs */
-const getRuns = () => api.get("/runs");
+const getRuns = () => {
+  const res = api.get("/runs");
+  console.log(res);
+  return res;
+
+}
 const getRun = (id: string) => api.get(`/runs/${id}`);
 
 const runs = {
@@ -17,6 +22,14 @@ const runs = {
   getRun,
 };
 
+const upload = (data: any) =>
+  api.post("/upload", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
 export default {
   runs,
+  upload,
 };
