@@ -1,4 +1,3 @@
-import React from "react";
 import { protein_result } from "../types/proteins";
 import ProteinResult from "./ProteinResult";
 

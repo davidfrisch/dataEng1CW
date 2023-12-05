@@ -11,3 +11,14 @@ services:
       - 5432:5432
     volumes:
       - /mnt/data/postgres-data:/var/lib/postgresql/data
+
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    env_file:
+      - ./frontend/.env
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./data:/data

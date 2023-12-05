@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import api from "../api";
 import { STATUS_COLORMAP, STATUS_UPLOAD } from "../constants";
