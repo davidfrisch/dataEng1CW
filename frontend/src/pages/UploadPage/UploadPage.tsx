@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
-import api from "../api";
-import { STATUS_COLORMAP, STATUS_UPLOAD } from "../constants";
-import StartRunForm from "../components/StartRunForm/StartRunForm";
+import api from "../../api";
+import { STATUS_COLORMAP, STATUS_UPLOAD } from "../../constants";
+import StartRunForm from "../../components/StartRunForm/StartRunForm";
+import "./styles.css";
 
 type Props = {};
 const fileTypes = ["fasta", "fa"];
@@ -30,6 +31,11 @@ export default function UploadPage({}: Props) {
       .catch((err) => console.log(err));
   };
 
+  const handleRemoveFile = () => {
+    setFile(null);
+    setUploadedStatus(null);
+  }
+
   return (
     <div>
       <h1>Drop the fasta file like if it is hot !</h1>
@@ -43,14 +49,14 @@ export default function UploadPage({}: Props) {
       </div>
       <div style={{ display: "flex", alignItems: "center" }}>
         {file && (
-          <button onClick={() => setFile(null)} style={{ marginRight: "1rem" }}>
+          <button onClick={handleRemoveFile} style={{ marginRight: "1rem" }}>
             {" "}
             x{" "}
           </button>
         )}
         <p>{file ? `File name: ${file?.name}` : "no files uploaded yet"}</p>
       </div>
-      <button disabled={!file} onClick={handleSubmit}>
+      <button disabled={!file} onClick={handleSubmit} hidden={uploadedStatus}>
         Submit
       </button>
 
@@ -70,7 +76,7 @@ export default function UploadPage({}: Props) {
               <span
                 style={{ color: STATUS_COLORMAP[STATUS_UPLOAD.ALREADY_EXIST] }}
               >
-                Already exists
+                Already Saved
               </span>
             </div>
             <div style={{ marginRight: "1rem" }}>
@@ -79,7 +85,7 @@ export default function UploadPage({}: Props) {
               </span>
             </div>
           </div>
-          <ul>
+          <ul className="list-sequences">
             {uploadedStatus.protein_status.map((seq: any) => (
               <li
                 key={seq.id}
@@ -100,7 +106,6 @@ export default function UploadPage({}: Props) {
         </div>
       )}
       {uploadedStatus?.fasta_file_path && <div>
-        <h2>Do you want to start the pipeline ?</h2>
         <StartRunForm fasta_file_path={uploadedStatus?.fasta_file_path} />
       </div>}
     </div>

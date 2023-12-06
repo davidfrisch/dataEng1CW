@@ -1,25 +1,35 @@
-
 .run-page {
-    display: flex;
-    width: 100%;
+  display: flex;
+  width: 100%;
 }
 
 .run-results-container {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    margin-top: 20px;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  margin-top: 20px;
 }
 
 table {
-    margin-top: 20px;
-    width: 50%;
+  margin-top: 20px;
+  width: 100%;
+  overflow-y: auto;
+  height: 50vh;
 }
 
 table th {
-    text-align: left;
+  text-align: left;
+  margin-bottom: 10px;
 }
 
-table td {
-    text-align: left;
+tbody tr, thead tr {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr; 
+}
+
+tbody {
+  height: 68vh;
+  width: 100%;
+  overflow-y: auto;
+  display: block;
 }

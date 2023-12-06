@@ -12,7 +12,7 @@ export default function NavBar({}: Props) {
   }
 
   function goToMetrics() {
-    window.open("http://ec2-18-130-66-138.eu-west-2.compute.amazonaws.com/spark-master", "_blank");
+    window.open("", "_blank");
   }
 
   function goToSearch() {
@@ -25,7 +25,7 @@ export default function NavBar({}: Props) {
       <button className="nav-button" onClick={goToUpload}>Upload</button>
       <button className="nav-button" onClick={goToSearch}>Search</button>
       <button className="nav-button" onClick={goToRuns}>Runs</button>
-      <button className="nav-button" onClick={goToMetrics}>Metrics</button>
+      <button className="nav-button" onClick={goToMetrics}>Spark UI</button>
     </div>
   );
 }

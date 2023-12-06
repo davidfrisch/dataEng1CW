@@ -1,5 +1,6 @@
 import { useState } from "react";
 import api from "../../api";
+import { SPARK_URL } from "../../constants";
 
 type Props = {
   fasta_file_path: string;
@@ -21,15 +22,15 @@ export default function StartRunForm({ fasta_file_path }: Props) {
   if (status)
     return (
       <div>
-        <h1>Run started</h1>
-        <p>Pipeline {status.run_id} started,</p>
-        <p>Check the status of the run in the "Metrics" page</p>
+        <h1>Pipeline in process 🚀 !</h1>
+        <button><a  href={SPARK_URL + "/"} target="_blank" rel="noreferrer">Spark UI</a></button>
+        <p>Pipeline <strong>{status.run_id}</strong> started </p>
       </div>
     );
 
   return (
     <div>
-      <h1>Start a new run</h1>
+      <h2>Start a new run</h2>
       <form onSubmit={handleSubmit}>
         <label htmlFor="process_name">Name of the run:</label>
         <input
