@@ -1,12 +1,12 @@
 services:
   postgres:
-    container_name: postgres
+    container_name: postgres-db
     image: postgres:latest
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: proteomics
     ports:
       - 5432:5432
     volumes:
@@ -16,9 +16,21 @@ services:
     container_name: frontend
     build: ./frontend
     env_file:
-      - ./frontend/.env
+      - ./frontend/.env.staging
     restart: always
     ports:
       - 80:80
+    volumes:
+      - ./data:/data
+
+
+  backend:
+    container_name: backend
+    build: ./backend
+    env_file:
+      - ./backend/.env.staging
+    restart: always
+    ports:
+      - 3001:3001
     volumes:
       - ./data:/data

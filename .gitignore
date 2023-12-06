@@ -8,7 +8,7 @@ venv
 tmp
 *.csv
 __pycache__
-.env
+.env*
 *.egg-info
 build
 *.egg
