@@ -12,7 +12,7 @@ export default function NavBar({}: Props) {
   }
 
   function goToMetrics() {
-    window.location.href = "/metrics";
+    window.open("http://ec2-18-130-66-138.eu-west-2.compute.amazonaws.com/spark-master", "_blank");
   }
 
   function goToSearch() {

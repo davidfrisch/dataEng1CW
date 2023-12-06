@@ -14,7 +14,7 @@ DOCKER_SHARE_DIR="/data"
 VITE_BACKEND_URL="http://localhost:3001"
 VITE_DOCKER_BACKEND_URL="http://ec2-18-130-66-138.eu-west-2.compute.amazonaws.com/api"
 FLASK_URL=http://127.0.0.1:5000
-DOCKER_FLASK_URL=http://spark-master:5000
+DOCKER_FLASK_URL=http://10.0.0.169:5000
 
 # For pipeline
 echo "PYTHON3_PATH=$PYTHON3_PATH" > $DIRECTORY/../.env
