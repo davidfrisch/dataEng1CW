@@ -1,0 +1,35 @@
+.proteins-result-container {
+  width: 80%;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 30px;
+}
+
+.protein-container {
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+  margin-bottom: 12px;
+}
+
+.title-id{
+  margin: 0;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.score-container {
+  display: flex;
+  justify-content: flex-start;
+  width: 50%;
+}
+
+.score-container > div {
+  margin-right: 30px;
+}
+
+.actions{
+  display: flex;
+  align-items: end;
+}
+
