@@ -18,5 +18,6 @@ setup(
         'torch',
         'flask',
         'flask-cors',
+        'gunicorn',
     ]
 )

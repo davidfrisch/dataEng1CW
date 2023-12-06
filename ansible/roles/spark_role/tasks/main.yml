@@ -17,7 +17,7 @@
   include_tasks: tasks/install_spark.yml
   when: not spark_dir.stat.exists
 
-- name: Set ports for Spark
-  include_tasks: tasks/set_ports_spark.yml
+- name: Set envs for Spark
+  include_tasks: tasks/set_envs_spark.yml
   when: not spark_dir.stat.exists
 

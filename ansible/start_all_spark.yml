@@ -1,7 +1,0 @@
-- name: Start Spark Playbook
-  hosts: client
-
-  tasks:
-    - include_vars: vars.yml
-    - name: Start spark master and workers set in its workers file
-      command: "{{ spark_install_dir}}/spark/sbin/start-all.sh"

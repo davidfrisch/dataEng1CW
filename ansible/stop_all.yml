@@ -1,0 +1,15 @@
+- name: Stop Cluster Playbook
+  hosts: client
+
+  tasks:
+    - include_vars: vars.yml
+    - name: Stop spark and workers set in its workers file
+      command: "{{ spark_install_dir}}/spark/sbin/stop-all.sh"
+
+    - name: Docker compose down
+      shell:  cd {{ repo_dir }} && docker compose down
+  
+    - name: Stop flask app
+      shell: "pkill -f 'gunicorn -b 0.0.0.0:5000 flask_app:app'"
+      async: 0
+      poll: 0

@@ -46,10 +46,11 @@
 
 # Options for the daemons used in the standalone deploy mode
 SPARK_MASTER_HOST="spark-master"
-# ^- SPARK_MASTER_PORT / SPARK_MASTER_WEBUI_PORT, to use non-default ports for the master
-# - SPARK_MASTER_OPTS, to set config properties only for the master (e.g. "-Dx=y")
 SPARK_WORKER_CORES=1
 SPARK_WORKER_MEMORY=2g
+SPARK_PUBLIC_DNS=ec2-18-130-66-138.eu-west-2.compute.amazonaws.com/spark-master
+# ^- SPARK_MASTER_PORT / SPARK_MASTER_WEBUI_PORT, to use non-default ports for the master
+# - SPARK_MASTER_OPTS, to set config properties only for the master (e.g. "-Dx=y")
 # - SPARK_WORKER_PORT / SPARK_WORKER_WEBUI_PORT, to use non-default ports for the worker
 # - SPARK_WORKER_DIR, to set the working directory of worker processes
 # - SPARK_WORKER_OPTS, to set config properties only for the worker (e.g. "-Dx=y")
@@ -58,7 +59,6 @@ SPARK_WORKER_MEMORY=2g
 # - SPARK_SHUFFLE_OPTS, to set config properties only for the external shuffle service (e.g. "-Dx=y")
 # - SPARK_DAEMON_JAVA_OPTS, to set config properties for all daemons (e.g. "-Dx=y")
 # - SPARK_DAEMON_CLASSPATH, to set the classpath for all daemons
-SPARK_PUBLIC_DNS=ec2-18-130-66-138.eu-west-2.compute.amazonaws.com/spark-master
 
 # Options for launcher
 # - SPARK_LAUNCHER_OPTS, to set config properties and Java options for the launcher (e.g. "-Dx=y")

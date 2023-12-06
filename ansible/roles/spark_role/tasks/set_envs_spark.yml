@@ -1,0 +1,40 @@
+---
+
+- name: Create spark-defaults.conf from spark-defaults.conf.template
+  copy:
+    src: "{{ spark_install_dir }}/spark/conf/spark-defaults.conf.template"
+    dest: "{{ spark_install_dir }}/spark/conf/spark-defaults.conf"
+    remote_src: yes
+    owner: "{{ spark_user }}"
+    group: "{{ spark_group }}"
+    mode: 0644
+
+- name: Set spark block manager port, spark.driver.host, spark.driver.port, spark.driver.blockManager.port
+  lineinfile:
+    dest: "{{ spark_install_dir }}/spark/conf/spark-defaults.conf"
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "spark.ui.reverseProxy true"
+    - "spark.ui.reverseProxyUrl  http://{{ groups['client'][0] }}/spark-master/"
+    - "spark.driver.port  40423"
+    - "spark.driver.blockManager.port  34541"
+
+- name: Create spark-env.sh from spark-env.sh.template
+  copy:
+    src: "{{ spark_install_dir }}/spark/conf/spark-env.sh.template"
+    dest: "{{ spark_install_dir }}/spark/conf/spark-env.sh"
+    remote_src: yes
+    owner: "{{ spark_user }}"
+    group: "{{ spark_group }}"
+    mode: 0644
+
+- name: Set SPARK_MASTER_HOST, SPARK_WORKER_CORES, SPARK_WORKER_MEMORY, SPARK_PUBLIC_DNS
+  lineinfile:
+    dest: "{{ spark_install_dir }}/spark/conf/spark-env.sh"
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "SPARK_WORKER_CORES=1"
+    - "SPARK_WORKER_MEMORY=1g"
+

@@ -1,0 +1,28 @@
+- name: Start Cluster Playbook
+  hosts: client
+
+  tasks:
+    - include_vars: vars.yml
+
+    - name: Start spark master and workers set in its workers file
+      command: "{{ spark_install_dir}}/spark/sbin/start-all.sh"
+
+    - name: Docker compose build
+      shell:  cd {{ repo_dir }} && docker compose build
+
+    - name: Docker compose up
+      shell:  cd {{ repo_dir }} && docker compose up -d
+
+    - name: Docker compose ps
+      shell:  cd {{ repo_dir }} && docker compose ps
+
+    - name: Start flask app
+      shell: source {{ repo_dir }}/venv/bin/activate && \
+            cd {{ repo_dir }}/pipeline && \
+            gunicorn -b 0.0.0.0:5000 flask_app:app --daemon
+      async: 0
+      poll: 0
+    
+
+   
+    

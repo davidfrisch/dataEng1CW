@@ -109,7 +109,7 @@ if __name__ == "__main__":
         print("Please set the spark master with --master or run locally with --local")
         sys.exit(1)
     
-    spark = SparkSession.builder.appName("pdb_analyse").master(master_url).getOrCreate()
+    spark = SparkSession.builder.appName(run_id).master(master_url).getOrCreate()
     path_to_pipeline_zip = zip_module()
     spark.sparkContext.addPyFile(path_to_pipeline_zip)
   
