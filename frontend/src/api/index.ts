@@ -9,8 +9,8 @@ export const api = axios.create({
 });
 
 /* all resquest with runs */
-const getRuns = () => {
-  const res = api.get("/runs");
+const getRuns = async () => {
+  const res = await api.get("/runs");
   console.log(res);
   return res;
 };

@@ -1,6 +1,6 @@
 import "./App.css";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-import RunsPage from "./pages/RunsPage";
+import RunsPage from "./pages/RunsPage/RunsPage";
 import RunPage from "./pages/RunPage";
 import NavBar from "./components/NavBar/NavBar";
 import UploadPage from "./pages/UploadPage";

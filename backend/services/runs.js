@@ -5,14 +5,12 @@ const prisma = new PrismaClient();
 
 export default {
   getRuns: async () => {
-    const results = prisma.protein_results.findMany({
-      distinct: ["run_id"],
-      select: {
-        run_id: true,
+    const runs = await prisma.pipeline_run_summary.findMany({
+      orderBy: {
+        date_created: "desc",
       },
     });
-
-    return results;
+    return runs;
   },
 
   getProteins: async (run_id) => {

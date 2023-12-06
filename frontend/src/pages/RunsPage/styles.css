@@ -1,0 +1,25 @@
+
+.run-page {
+    display: flex;
+    width: 100%;
+}
+
+.run-results-container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+table {
+    margin-top: 20px;
+    width: 50%;
+}
+
+table th {
+    text-align: left;
+}
+
+table td {
+    text-align: left;
+}
