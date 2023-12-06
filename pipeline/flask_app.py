@@ -5,7 +5,7 @@ import sys
 import os
 from time import time
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from pipeline.constants import SPARK_MASTER_URL
+from pipeline.constants import SPARK_MASTER_URL, ROOT_DIR
 app = Flask(__name__)
 CORS(app, origins=['*'])
 
@@ -30,7 +30,7 @@ def launch_pipeline():
     data = request.get_json()
     filepath = data['file_path'] if 'file_path' in data else None
     filename = filepath.split('/')[-1] if filepath else None
-    local_path = f'/mnt/data/dataEng1CW/data/{filename}'
+    local_path = f'{ROOT_DIR}/data/{filename}'
     name = data['name'] if 'name' in data else None
     run_id = name + '_' + str(int(time()))
 

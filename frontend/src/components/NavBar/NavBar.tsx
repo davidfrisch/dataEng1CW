@@ -1,3 +1,4 @@
+import { SPARK_URL } from '../../constants';
 import './styles.css'
 type Props = {};
 
@@ -12,7 +13,7 @@ export default function NavBar({}: Props) {
   }
 
   function goToMetrics() {
-    window.open("", "_blank");
+    window.open(SPARK_URL, "_blank");
   }
 
   function goToSearch() {
