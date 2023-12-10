@@ -88,12 +88,12 @@ def process_sequence(identifier, sequence, run_id, bucket, index):
 
 if __name__ == "__main__":
     # unique random id for this run time + bucket name
+    num_workers = None
     spark = None
     master_url = None
     bucket = None
     run_id = None
     args = argparser()
-
     if args.master:
         master_url = args.master
     if args.local:
@@ -103,6 +103,8 @@ if __name__ == "__main__":
         bucket = args.bucket
     if args.run_id:
         run_id = args.run_id
+    if args.num_workers:
+        num_workers = args.num_workers
 
     print('url:'+master_url)
     if not (master_url or args.local):
@@ -123,7 +125,7 @@ if __name__ == "__main__":
     sequences = read_input(args.input_file)
     sequence_list = list(sequences.items())
 
-    parallelised_data = spark.sparkContext.parallelize(sequence_list)
+    parallelised_data = spark.sparkContext.parallelize(sequence_list, numSlices=num_workers)
     parallelised_data.foreach(lambda x: process_sequence(x[0], x[1], run_id, bucket, sequence_list.index(x)))
 
     merge_results(bucket, run_id)

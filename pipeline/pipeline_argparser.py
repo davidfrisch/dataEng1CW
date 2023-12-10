@@ -25,6 +25,7 @@ def argparser():
     parser.add_argument('-m', '--master', help='Spark master url', default=master_url)
     parser.add_argument('--bucket', help='S3 bucket name', default=bucket)
     parser.add_argument('--run_id', help='Unique run id', default=run_id)
+    parser.add_argument('--num_workers', help='Number of workers', default=4)
 
     args = parser.parse_args()
     return args
