@@ -23,10 +23,13 @@ type StartRunData = {
 const startRun = (data: StartRunData) =>
   api.post("/runs/launch_pipeline", data);
 
+const downloadRun = (id: string) => api.get(`/runs/${id}/download`);
+
 const runs = {
   getRuns,
   getRun,
   startRun,
+  downloadRun,
 };
 
 const upload = (data: any) =>

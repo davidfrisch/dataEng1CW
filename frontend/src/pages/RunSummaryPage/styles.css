@@ -4,6 +4,14 @@
   margin-top: 20px;
 }
 
+.run-summary-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
 .run-summary-item-container {
   display: flex;
   flex-direction: column;

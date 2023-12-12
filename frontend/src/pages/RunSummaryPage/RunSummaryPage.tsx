@@ -4,9 +4,8 @@ import api from "../../api";
 import { useParams } from "react-router-dom";
 import { run_summary } from "../../types/run_summary";
 import "./styles.css";
-type Props = {};
 
-export default function RunSummaryPage({}: Props) {
+export default function RunSummaryPage() {
   const { runId } = useParams();
   const [runResults, setRunResults] = React.useState([]);
   const [runSummary, setRunSummary] = React.useState<run_summary | null>(null);
@@ -19,6 +18,22 @@ export default function RunSummaryPage({}: Props) {
       const { proteins, run_summary } = json;
       setRunSummary(run_summary);
       setRunResults(proteins);
+    } catch (err: any) {
+      console.error(err.message);
+    }
+  };
+
+  const downloadRunResults = async () => {
+    if (!runId) return;
+
+    try {
+      const csvFile = await api.runs.downloadRun(runId);
+      const url = window.URL.createObjectURL(new Blob([csvFile.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "run_results.csv");
+      document.body.appendChild(link);
+      link.click();
     } catch (err: any) {
       console.error(err.message);
     }
@@ -39,7 +54,12 @@ export default function RunSummaryPage({}: Props) {
       <h1>Run Results</h1>
       {runSummary && (
         <div className="run-summary">
-          <h2>Run Summary</h2>
+          <div className="run-summary-header">
+            <h2>Run Summary</h2>
+            <button hidden={!runId} onClick={downloadRunResults} className="btn btn-primary">
+              Download
+            </button>
+          </div>
 
           <div className="run-summary-container">
             <div className="run-summary-item-container">
