@@ -26,8 +26,8 @@ export const RunsController = {
   downloadRun: async (req, res) => {
     const run_id = req.params.run_id;
 
-    const proteins = await ResultsProteinsService.getProteins(run_id);
-    const csv = ResultsProteinsService.toCSV(proteins);
+    const proteins = await RunsService.getProteins(run_id);
+    const csv = RunsService.toCSV(proteins);
     res.setHeader(`Content-disposition`, `attachment; filename=${run_id}.csv`);
     res.set("Content-Type", "text/csv");
     res.status(200).send(csv);
