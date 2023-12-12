@@ -4,6 +4,8 @@ from botocore.exceptions import ClientError
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import PYTHON3_PATH, HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, SRC_DIR
 from pipeline.worker_results_parser import run_hhr_parser
+from pipeline.database import create_session
+from pipeline.models.protein_results import ProteinResults, SUCCESS
 from subprocess import Popen, PIPE
 import boto3
 
@@ -92,3 +94,58 @@ def upload_file_to_s3(bucket, file_name, object_name=None):
         print("Error uploading file to S3")
         return False
     return True
+
+def update_sequence_database(output_file, run_id, identifier):
+    """
+    Update the sequence database with the results
+    """
+
+    # format query_id,best_hit,best_evalue,best_score,score_mean,score_std,score_gmean
+    # only 1 line
+
+    result = {}
+
+    with open(output_file) as fh_in:
+        line = fh_in.readline()
+        fields = line.split(',')
+        result['best_hit'] = fields[1]
+        result['best_evalue'] = fields[2]
+        result['best_score'] = fields[3]
+        result['score_mean'] = fields[4]
+        result['score_std'] = fields[5]
+        result['score_gmean'] = fields[6]
+
+
+
+    session = None
+    try:
+        session = create_session()
+        protein_result = session.query(ProteinResults).filter(ProteinResults.run_id == run_id).filter(ProteinResults.query_id == identifier).first()
+        protein_result.best_hit = result['best_hit']
+        protein_result.best_evalue = result['best_evalue']
+        protein_result.best_score = result['best_score']
+        protein_result.score_mean = result['score_mean']
+        protein_result.score_std = result['score_std']
+        protein_result.score_gmean = result['score_gmean']
+        session.add(protein_result)
+        session.commit()
+        session.close()
+    except Exception as e:
+        print("Error while updating database: ", e)
+
+
+def update_db_status(run_id, identifier, status):
+    """
+    Update the status of the protein in the database
+    """
+    session = None
+    try:
+        session = create_session()
+        protein_result = session.query(ProteinResults).filter(ProteinResults.run_id == run_id).filter(ProteinResults.query_id == identifier).first()
+        protein_result.status = status
+        session.add(protein_result)
+        session.commit()
+        session.close()
+        print(f"Updated status of {identifier} to {status}")
+    except Exception as e:
+        print("Error while updating database: ", e)

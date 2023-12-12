@@ -7,7 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import ROOT_DIR
 from pipeline.database import create_session
 from pipeline.models.protein_results import ProteinResults
-from pipeline.models.pipeline_run_summary import PipelineRunSummary
+from pipeline.models.pipeline_run_summary import PipelineRunSummary, SUCCESS
 # Define the indices of the columns in the results file
 QUERY_ID_INDEX = 0
 BEST_HIT_INDEX = 1
@@ -141,53 +141,22 @@ def save_results_to_db(merged_results_csv, avg_score_std, avg_score_gmean, total
     """
     print("SAVING RESULTS TO DATABASE")
     session = None
-    whoami = os.getenv('USER')
+   
     try:
         session = create_session()
 
-        # Create a new pipeline_run_summary object
-        pipeline_run_summary = PipelineRunSummary(
-            run_id=run_id,
-            execution_time=total_time,
-            score_std=avg_score_std,
-            score_gmean=avg_score_gmean,
-            date_created=datetime.now(),
-            author=whoami
-        )
-
-        session.add(pipeline_run_summary)
-        session.commit()
-
-
-        csv_reader = csv.reader(open(merged_results_csv, "r"), delimiter=",")
-        header = next(csv_reader)
-        for row in csv_reader:
-            # Create a new protein_result object
-            for i in range(2, len(row)):
-                if row[i] == 'nan':
-                    row[i] = None
-                else:
-                    row[i] = float(row[i])
-
-            protein_result = ProteinResults(
-            run_id=run_id,
-            query_id=row[QUERY_ID_INDEX],
-            best_hit=row[BEST_HIT_INDEX],
-            best_evalue=row[BEST_EVALUE_INDEX],
-            best_score=row[BEST_SCORE_INDEX],
-            score_mean=row[SCORE_MEAN_INDEX],
-            score_std=row[SCORE_STD_INDEX],
-            score_gmean=row[SCORE_GMEAN_INDEX]
-            )
-            # Add the object to the session
-            session.add(protein_result)
+        new_pipeline_run_summary = session.query(PipelineRunSummary).filter(PipelineRunSummary.run_id == run_id).first()
+        new_pipeline_run_summary.status = SUCCESS
+        new_pipeline_run_summary.date_finished = datetime.now()
+        new_pipeline_run_summary.duration = total_time
+        new_pipeline_run_summary.score_std = avg_score_std
+        new_pipeline_run_summary.score_gmean = avg_score_gmean
         
+        session.add(new_pipeline_run_summary)
         session.commit()
-        session.close()
     except Exception as e:
-        print("Error while saving results to database: ", e)
-        if session:
-            session.rollback()
-            
-        raise Exception("Error while saving results to database")
+        print("Error while updating database: ", e)
+        session.rollback()
+        
+    session.close()
     print("RESULTS SAVED TO DATABASE")

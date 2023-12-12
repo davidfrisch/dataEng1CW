@@ -10,6 +10,7 @@ datasource db {
 model protein_results {
   run_id      String  @db.VarChar
   query_id    String  @db.VarChar
+  status      status
   best_hit    String? @db.VarChar
   best_evalue Float?
   best_score  Float?
@@ -26,10 +27,18 @@ model proteomes {
 }
 
 model pipeline_run_summary {
-  run_id         String  @id @db.VarChar
-  execution_time Float?
-  score_std      Float?
-  score_gmean    Float?
-  date_created   String? @db.VarChar
-  author         String? @db.VarChar
+  run_id        String  @id @db.VarChar
+  status        status
+  duration      Float?
+  score_std     Float?
+  score_gmean   Float?
+  date_started  String  @db.VarChar
+  date_finished String? @db.VarChar
+  author        String  @db.VarChar
+}
+
+enum status {
+  SUCCESS
+  RUNNING
+  PENDING
 }

@@ -1,6 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from pipeline.constants import DATABASE_URL
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, database_exists
 from pipeline.models.protein_results import ProteinResults
@@ -11,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 # Replace placeholders with your PostgreSQL credentials
 
 def get_engine():
-    db_url = "postgresql://postgres:postgres@localhost:5432/proteomics"
+    db_url = DATABASE_URL
     engine = create_engine(db_url)
     return engine
 # connect to the database

@@ -2,15 +2,18 @@
 import os
 import sys
 import time
+from datetime import datetime
 from pyspark.sql import SparkSession
 from Bio import SeqIO
 from pipeline_argparser import argparser
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR
-from pipeline.worker_task import run_s4pred, read_horiz, run_hhsearch, run_parser, upload_file_to_s3
+from pipeline.worker_task import run_s4pred, read_horiz, run_hhsearch, run_parser, upload_file_to_s3, update_sequence_database, update_db_status
 from pipeline.master_task import merge_results, write_best_hits, write_profile_csv, save_results_to_db, get_avg_score_gmean, get_avg_score_std
 import zipfile
-
+from pipeline.database import create_session
+from pipeline.models.protein_results import ProteinResults, PENDING
+from pipeline.models.pipeline_run_summary import PipelineRunSummary, SUCCESS, RUNNING
 
 
 def zip_module():
@@ -77,11 +80,14 @@ def process_sequence(identifier, sequence, run_id, bucket, index):
         fh_out.write(f">{identifier}\n")
         fh_out.write(f"{sequence}\n")
 
+    update_db_status(run_id, identifier, RUNNING)
     run_s4pred(tmp_file, horiz_file)
     read_horiz(tmp_file, horiz_file, a3m_file)
     run_hhsearch(a3m_file)
     run_parser(hhr_file, output_file)
     upload_file_to_s3(bucket, output_file, object_name)
+    update_sequence_database(output_file, run_id, identifier)
+    update_db_status(run_id, identifier, SUCCESS)
 
 
 
@@ -124,7 +130,28 @@ if __name__ == "__main__":
 
     sequences = read_input(args.input_file)
     sequence_list = list(sequences.items())
+    whoami = os.getenv('USER')
+    session = create_session()
+    new_pipeline_run_summary = PipelineRunSummary(
+        run_id=run_id,
+        status=RUNNING,
+        date_started=datetime.now(),
+        author=whoami
+    )
+    session.add(new_pipeline_run_summary)
+    session.commit()
 
+    for sequence in sequence_list:
+        id = sequence[0]
+        seq = sequence[1]
+        new_protein_results = ProteinResults(
+            run_id=run_id,
+            query_id=id,
+            status=PENDING
+        )
+        session.add(new_protein_results)
+
+    session.commit()
     parallelised_data = spark.sparkContext.parallelize(sequence_list, numSlices=num_workers)
     parallelised_data.foreach(lambda x: process_sequence(x[0], x[1], run_id, bucket, sequence_list.index(x)))
 

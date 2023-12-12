@@ -7,7 +7,7 @@ export default {
   getRuns: async () => {
     const runs = await prisma.pipeline_run_summary.findMany({
       orderBy: {
-        date_created: "desc",
+        date_started: "desc",
       },
     });
     return runs;

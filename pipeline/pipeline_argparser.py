@@ -4,7 +4,7 @@ import argparse
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from pipeline.constants import BUCKET_NAME, SPARK_MASTER_URL
+from pipeline.constants import BUCKET_NAME, SPARK_MASTER_URL, NUM_WORKERS_DEFAULT
 
 def argparser():
     """
@@ -25,7 +25,7 @@ def argparser():
     parser.add_argument('-m', '--master', help='Spark master url', default=master_url)
     parser.add_argument('--bucket', help='S3 bucket name', default=bucket)
     parser.add_argument('--run_id', help='Unique run id', default=run_id)
-    parser.add_argument('--num_workers', help='Number of workers', default=4)
+    parser.add_argument('--num_workers', help='Number of workers', default=NUM_WORKERS_DEFAULT)
 
     args = parser.parse_args()
     return args

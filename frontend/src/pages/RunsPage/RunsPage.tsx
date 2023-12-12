@@ -40,7 +40,7 @@ export default function RunsPage({}: Props) {
             <tr>
               <th>Run ID</th>
               <th>Author</th>
-              <th>Created</th>
+              <th>Finished</th>
               <th>Duration</th>
             </tr>
           </thead>
@@ -54,8 +54,8 @@ export default function RunsPage({}: Props) {
                     </a>
                   </td>
                   <td>{runResults.author}</td>
-                  <td>{runResults.date_created.split(".")[0]}</td>
-                  <td>{(Math.floor(runResults.execution_time / 60) + "m " + (runResults.execution_time % 60).toFixed(0) + "s")}</td>
+                  <td>{runResults.date_finished.split(".")[0]}</td>
+                  <td>{(Math.floor(runResults.duration / 60) + "m " + (runResults.duration % 60).toFixed(0) + "s")}</td>
                 </tr>
               ))}
           </tbody>

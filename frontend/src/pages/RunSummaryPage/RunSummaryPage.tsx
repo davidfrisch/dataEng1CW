@@ -70,9 +70,9 @@ export default function RunSummaryPage() {
             <div className="run-summary-item-container">
               <div className="run-summary-title-item">Run time</div>
               <div className="run-summary-item">
-                {Math.floor(runSummary.execution_time / 60) +
+                {Math.floor(runSummary.duration / 60) +
                   "m " +
-                  (runSummary.execution_time % 60).toFixed(0) +
+                  (runSummary.duration % 60).toFixed(0) +
                   "s"}
               </div>
             </div>
@@ -88,8 +88,8 @@ export default function RunSummaryPage() {
             </div>
 
             <div className="run-summary-item-container">
-              <div className="run-summary-title-item">Created at</div>
-              <div className="run-summary-item">{runSummary.date_created}</div>
+              <div className="run-summary-title-item">Finished at</div>
+              <div className="run-summary-item">{runSummary.date_finished}</div>
             </div>
 
             <div className="run-summary-item-container">

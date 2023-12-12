@@ -10,7 +10,7 @@ import { ProteinsRouter } from "./routes/proteins.js";
 const app = express();
 app.use(cors());
 app.use(helmet());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "50mb" }));
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
