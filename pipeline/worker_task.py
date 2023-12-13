@@ -7,6 +7,7 @@ from pipeline.worker_results_parser import run_hhr_parser
 from pipeline.database import create_session
 from pipeline.models.protein_results import ProteinResults, SUCCESS
 from subprocess import Popen, PIPE
+import sqlalchemy
 import boto3
 
 
@@ -108,12 +109,12 @@ def update_sequence_database(output_file, run_id, identifier):
     with open(output_file) as fh_in:
         line = fh_in.readline()
         fields = line.split(',')
-        result['best_hit'] = fields[1]
-        result['best_evalue'] = fields[2]
-        result['best_score'] = fields[3]
-        result['score_mean'] = fields[4]
-        result['score_std'] = fields[5]
-        result['score_gmean'] = fields[6]
+        result['best_hit'] = fields[1] if fields[1] != 'nan' else sqlalchemy.null()
+        result['best_evalue'] = fields[2] if fields[2] != 'nan' else sqlalchemy.null()
+        result['best_score'] = fields[3] if fields[3] != 'nan' else sqlalchemy.null()
+        result['score_mean'] = fields[4] if fields[4] != 'nan' else sqlalchemy.null()
+        result['score_std'] = fields[5] if fields[5] != 'nan' else sqlalchemy.null()
+        result['score_gmean'] = fields[6] if fields[6] != 'nan' else sqlalchemy.null()
 
 
 
@@ -121,7 +122,7 @@ def update_sequence_database(output_file, run_id, identifier):
     try:
         session = create_session()
         protein_result = session.query(ProteinResults).filter(ProteinResults.run_id == run_id).filter(ProteinResults.query_id == identifier).first()
-        protein_result.best_hit = result['best_hit']
+        protein_result.best_hit = result['best_hit'] 
         protein_result.best_evalue = result['best_evalue']
         protein_result.best_score = result['best_score']
         protein_result.score_mean = result['score_mean']

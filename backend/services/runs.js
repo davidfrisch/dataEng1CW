@@ -18,6 +18,9 @@ export default {
       where: {
         run_id: run_id,
       },
+      orderBy: {
+        status: "asc",
+      },
     });
 
     return results;
