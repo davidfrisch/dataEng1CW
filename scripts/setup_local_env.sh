@@ -7,6 +7,7 @@ S4PRED_PATH=/mnt/data/programs/s4pred
 S3_BUCKET_NAME=comp0235-ucabfri
 SPARK_MASTER_URL=spark://ip-10-0-0-169.eu-west-2.compute.internal:7077
 SPARK_UI_URL="http://ec2-18-130-66-138.eu-west-2.compute.amazonaws.com/spark-master"
+SPARK_LOCAL_UI_URL="localhost:8080"
 # DOCKER_SPARK_MASTER_URL=spark://spark-master:7077
 DATABASE_URL="postgresql://postgres:postgres@ip-10-0-0-169.eu-west-2.compute.internal:5432/proteomics"
 DOCKER_DATABASE_URL="postgresql://postgres:postgres@postgres:5432/proteomics"
@@ -23,9 +24,10 @@ echo "HH_SUITE__BIN_PATH=$HH_SUITE__BIN_PATH" >> $DIRECTORY/../.env
 echo "PDB70_PATH=$PDB70_PATH" >> $DIRECTORY/../.env
 echo "S4PRED_PATH=$S4PRED_PATH" >> $DIRECTORY/../.env
 echo "S3_BUCKET_NAME=$S3_BUCKET_NAME" >> $DIRECTORY/../.env
-echo "SPARK_MASTER_URL=$SPARK_MASTER_URL" >> $DIRECTORY/../.env
 echo "SHARE_DIR=$SHARE_DIR" >> $DIRECTORY/../.env
 echo "DATABASE_URL=$DATABASE_URL" >> $DIRECTORY/../.env
+echo "SPARK_MASTER_URL=$SPARK_MASTER_URL" >> $DIRECTORY/../.env
+echo "SPARK_LOCAL_UI_URL=$SPARK_LOCAL_UI_URL" >> $DIRECTORY/../.env
 
 # For backend
 echo "DATABASE_URL=$DATABASE_URL" > $DIRECTORY/../backend/.env

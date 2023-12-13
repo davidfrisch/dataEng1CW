@@ -15,6 +15,7 @@ S4PRED_PATH = os.getenv('S4PRED_PATH')
 BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 SPARK_MASTER_URL = os.getenv('SPARK_MASTER_URL')
 DATABASE_URL = os.getenv('DATABASE_URL')
+SPARK_LOCAL_UI_URL = os.getenv('SPARK_LOCAL_UI_URL') or 'http://localhost:8080'
 
 if not SPARK_MASTER_URL:
     print("Please set the SPARK_MASTER_URL in the .env file")

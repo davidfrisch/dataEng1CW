@@ -1,11 +1,12 @@
-from flask import Flask, request
-from flask_cors import CORS
-from subprocess import Popen, PIPE
 import sys
 import os
 from time import time
+from flask import Flask, request
+from flask_cors import CORS
+from subprocess import Popen, PIPE
+import requests
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from pipeline.constants import SPARK_MASTER_URL, ROOT_DIR
+from pipeline.constants import SPARK_MASTER_URL, ROOT_DIR, SPARK_LOCAL_UI_URL
 app = Flask(__name__)
 CORS(app, origins=['*'])
 
@@ -24,6 +25,16 @@ def hello_world():
         </body>
     </html>
     """
+
+@app.route('/health')
+def health():
+    try:
+        spark_info = requests.get(f'{SPARK_LOCAL_UI_URL}/json/')
+        return {'flask': {'status': "ALIVE"}, 'spark': spark_info.json()}
+    except Exception as e:
+        return {'status': 'error', 'error': str(e), 'spark_master_url': SPARK_MASTER_URL, 'spark': 'error'}
+
+
 
 @app.route('/launch_pipeline', methods=['POST'])
 def launch_pipeline():
@@ -54,4 +65,4 @@ def launch_pipeline():
     
     
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)

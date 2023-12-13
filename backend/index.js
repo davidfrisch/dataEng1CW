@@ -6,6 +6,7 @@ import "dotenv/config";
 import { RunsRouter } from "./routes/runs.js";
 import { UploadRouter } from "./routes/upload.js";
 import { ProteinsRouter } from "./routes/proteins.js";
+import { HealthRouter } from "./routes/health.js";
 
 const app = express();
 app.use(cors());
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 app.use("/runs", RunsRouter);
 app.use("/upload", UploadRouter);
 app.use("/proteins", ProteinsRouter);
+app.use("/health", HealthRouter);
 
 app.listen(3001, () => {
   console.log("Server is listening on port 3001");

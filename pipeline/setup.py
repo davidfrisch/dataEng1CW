@@ -19,5 +19,6 @@ setup(
         'flask',
         'flask-cors',
         'gunicorn',
+        'requests',
     ]
 )
