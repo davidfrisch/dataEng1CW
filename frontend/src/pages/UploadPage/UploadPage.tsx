@@ -4,13 +4,16 @@ import api from "../../api";
 import { STATUS_COLORMAP, STATUS_UPLOAD } from "../../constants";
 import StartRunForm from "../../components/StartRunForm/StartRunForm";
 import "./styles.css";
+import Pagniation from "../../components/Pagination/Pagniation";
 
-type Props = {};
 const fileTypes = ["fasta", "fa"];
+const itemsPerPage = 10;
 
-export default function UploadPage({}: Props) {
+export default function UploadPage() {
   const [file, setFile] = useState<any>(null);
   const [uploadedStatus, setUploadedStatus] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
   const [loading, setLoading] = useState<boolean>(false);
   const handleChange = (file: any) => {
     setFile(file);
@@ -89,23 +92,33 @@ export default function UploadPage({}: Props) {
               </span>
             </div>
           </div>
+          <Pagniation
+            setCurrentPage={setCurrentPage}
+            totalLenghth={uploadedStatus.protein_status.length}
+            itemsPerPage={itemsPerPage}
+          />
           <ul className="list-sequences">
-            {uploadedStatus.protein_status.map((seq: any) => (
-              <li
-                key={seq.id}
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <div
-                  style={{
-                    height: "1rem",
-                    width: "1rem",
-                    backgroundColor: STATUS_COLORMAP[seq.status],
-                    marginRight: "1rem",
-                  }}
-                ></div>
-                <span>{seq.id}</span>
-              </li>
-            ))}
+            {uploadedStatus.protein_status
+              .slice(
+                (currentPage - 1) * itemsPerPage,
+                currentPage * itemsPerPage
+              )
+              .map((seq) => (
+                <li
+                  key={seq.id}
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  <div
+                    style={{
+                      height: "1rem",
+                      width: "1rem",
+                      backgroundColor: STATUS_COLORMAP[seq.status],
+                      marginRight: "1rem",
+                    }}
+                  ></div>
+                  <span>{seq.id}</span>
+                </li>
+              ))}
           </ul>
         </div>
       )}

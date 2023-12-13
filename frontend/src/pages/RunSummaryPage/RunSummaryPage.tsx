@@ -1,14 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ListOfProteins from "../../components/ListOfProteins";
 import api from "../../api";
 import { useParams } from "react-router-dom";
 import { run_summary } from "../../types/run_summary";
 import "./styles.css";
+import Pagniation from "../../components/Pagination/Pagniation";
+
+const itemsPerPage = 10;
 
 export default function RunSummaryPage() {
   const { runId } = useParams();
-  const [runResults, setRunResults] = React.useState([]);
-  const [runSummary, setRunSummary] = React.useState<run_summary | null>(null);
+  const [runResults, setRunResults] = useState([]);
+  const [runSummary, setRunSummary] = useState<run_summary | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const getRunResults = async (id: string) => {
     try {
@@ -56,7 +60,11 @@ export default function RunSummaryPage() {
         <div className="run-summary">
           <div className="run-summary-header">
             <h2>Run Summary</h2>
-            <button hidden={runSummary.status !== "SUCCESS" } onClick={downloadRunResults} className="btn btn-primary">
+            <button
+              hidden={runSummary.status !== "SUCCESS"}
+              onClick={downloadRunResults}
+              className="btn btn-primary"
+            >
               Download
             </button>
           </div>
@@ -70,10 +78,12 @@ export default function RunSummaryPage() {
             <div className="run-summary-item-container">
               <div className="run-summary-title-item">Run time</div>
               <div className="run-summary-item">
-                {runSummary.status === "SUCCESS" ? Math.floor(runSummary.duration / 60) +
-                  "m " +
-                  (runSummary.duration % 60).toFixed(0) +
-                  "s" : runSummary.status}
+                {runSummary.status === "SUCCESS"
+                  ? Math.floor(runSummary.duration / 60) +
+                    "m " +
+                    (runSummary.duration % 60).toFixed(0) +
+                    "s"
+                  : runSummary.status}
               </div>
             </div>
 
@@ -89,7 +99,9 @@ export default function RunSummaryPage() {
 
             <div className="run-summary-item-container">
               <div className="run-summary-title-item">Created at</div>
-              <div className="run-summary-item">{runSummary?.date_started?.split('.')[0]}</div>
+              <div className="run-summary-item">
+                {runSummary?.date_started?.split(".")[0]}
+              </div>
             </div>
 
             <div className="run-summary-item-container">
@@ -99,7 +111,19 @@ export default function RunSummaryPage() {
           </div>
         </div>
       )}
-      {runResults.length && <ListOfProteins proteins_result={runResults} />}
+      <Pagniation
+        setCurrentPage={setCurrentPage}
+        totalLenghth={runResults.length}
+        itemsPerPage={itemsPerPage}
+      />
+      {runResults.length && (
+        <ListOfProteins
+          proteins_result={runResults.slice(
+            (currentPage - 1) * itemsPerPage,
+            currentPage * itemsPerPage
+          )}
+        />
+      )}
     </div>
   );
 }
