@@ -23,6 +23,10 @@ export default function NavBar({}: Props) {
     window.location.href = "/search";
   }
 
+  function goToNewRun() {
+    window.location.href = "/new-run";
+  }
+
   useEffect(() => {
     api
       .health()
@@ -41,6 +45,9 @@ export default function NavBar({}: Props) {
         <button className="nav-button" onClick={goToSearch}>
           Search
         </button>
+        <button className="nav-button" onClick={goToNewRun}>
+          New Run
+        </button>
         <button className="nav-button" onClick={goToRuns}>
           Runs
         </button>
@@ -55,9 +62,9 @@ export default function NavBar({}: Props) {
               <div className="navbar-status-item" key={key}>
                 <div className="navbar-status-item-name">{key}</div>
                 <div
-                  className={`navbar-status-item-status ${statusServices[key].status.toLowerCase() === "alive" ? "alive" : "dead"}`}
+                  className={`navbar-status-item-status ${statusServices[key].status?.toLowerCase() === "alive" ? "alive" : "dead"}`}
                 >
-                  {statusServices[key].status} 
+                  {statusServices[key].status || "OFFLINE"}
                 </div>
               </div>
             );

@@ -17,7 +17,8 @@ const getRun = (id: string) => api.get(`/runs/${id}`);
 
 type StartRunData = {
   process_name: string;
-  fasta_file_path: string;
+  ids?: string[];
+  fasta_file_path?: string;
 };
 const startRun = (data: StartRunData) =>
   api.post("/runs/launch_pipeline", data);
@@ -40,6 +41,19 @@ const upload = (data: any) =>
 
 const proteins = {
   getProtein: (id: string) => api.get(`/proteins/${id}`),
+  getProteins: async (ids: string[]) => {
+    const res = await api.post("/proteins/ids", { ids });
+    const proteins = res.data;
+    const missingIds = Object.keys(proteins).reduce((acc, id) => {
+      if (!proteins[id]) acc.push(id);
+      return acc;
+    }, [] as string[]);
+    const foundIds = Object.keys(proteins).reduce((acc, id) => {
+      if (proteins[id]) acc.push(id);
+      return acc;
+    }, [] as string[]);
+    return { missingIds, foundIds };
+  },
 };
 
 const health = () => api.get("/health");

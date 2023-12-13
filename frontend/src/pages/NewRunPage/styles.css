@@ -1,0 +1,16 @@
+
+.file-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.list {
+  display: flex;
+  max-height: 30rem;
+  overflow-y: auto;
+}
+
+.lists-container {
+  display: flex;
+}
