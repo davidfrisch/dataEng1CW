@@ -8,7 +8,7 @@ from Bio import SeqIO
 from pipeline_argparser import argparser
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR
-from pipeline.worker_task import run_s4pred, read_horiz, run_hhsearch, run_parser, upload_file_to_s3, update_sequence_database, update_db_status
+from pipeline.worker_task import run_s4pred, read_horiz, run_hhsearch, run_parser, update_sequence_database, update_db_status
 from pipeline.master_task import merge_results, write_best_hits, write_profile_csv, save_results_to_db, get_avg_score_gmean, get_avg_score_std
 import zipfile
 from pipeline.database import create_session
@@ -52,7 +52,7 @@ def read_input(file):
     return(sequences)
 
 
-def process_sequence(identifier, sequence, run_id, bucket, index):
+def process_sequence(identifier, sequence, run_id, index):
     print(f"PROCESSING SEQUENCE {index} with id {identifier}")
     tmp_file = f"{ROOT_DIR}/tmp/{run_id}/{index}.fas"
     horiz_file = f"{ROOT_DIR}/tmp/{run_id}/horiz/{index}.horiz"
@@ -85,7 +85,6 @@ def process_sequence(identifier, sequence, run_id, bucket, index):
     read_horiz(tmp_file, horiz_file, a3m_file)
     run_hhsearch(a3m_file)
     run_parser(hhr_file, output_file)
-    upload_file_to_s3(bucket, output_file, object_name)
     update_sequence_database(output_file, run_id, identifier)
     update_db_status(run_id, identifier, SUCCESS)
 
@@ -93,11 +92,10 @@ def process_sequence(identifier, sequence, run_id, bucket, index):
 
 
 if __name__ == "__main__":
-    # unique random id for this run time + bucket name
+    # unique random id for this run time in order to avoid conflicts
     num_workers = None
     spark = None
     master_url = None
-    bucket = None
     run_id = None
     args = argparser()
     if args.master:
@@ -105,8 +103,6 @@ if __name__ == "__main__":
     if args.local:
         print("RUNNING LOCALLY")
         master_url = "local[*]"
-    if args.bucket:
-        bucket = args.bucket
     if args.run_id:
         run_id = args.run_id
     if args.num_workers:
@@ -153,13 +149,13 @@ if __name__ == "__main__":
 
     session.commit()
     parallelised_data = spark.sparkContext.parallelize(sequence_list, numSlices=num_workers)
-    parallelised_data.foreach(lambda x: process_sequence(x[0], x[1], run_id, bucket, sequence_list.index(x)))
+    parallelised_data.foreach(lambda x: process_sequence(x[0], x[1], run_id,  sequence_list.index(x)))
 
-    merge_results(bucket, run_id)
-    write_best_hits(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", f"{ROOT_DIR}/output/{run_id}/best_hits_output.csv")
-    avg_score_std = get_avg_score_std(f"{ROOT_DIR}/output/{run_id}/merge_result.csv")
-    avg_score_gmean = get_avg_score_gmean(f"{ROOT_DIR}/output/{run_id}/merge_result.csv")
+    merge_results(run_id)
+    write_best_hits(f"{ROOT_DIR}/output/{run_id}/best_hits_output.csv", run_id)
+    avg_score_std = get_avg_score_std(run_id)
+    avg_score_gmean = get_avg_score_gmean(run_id)
     write_profile_csv(avg_score_std, avg_score_gmean,  f"{ROOT_DIR}/output/{run_id}/profile_output.csv")
     total_time = time.time() - start_time
-    save_results_to_db(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", avg_score_std, avg_score_gmean, total_time, run_id)
+    save_results_to_db(avg_score_std, avg_score_gmean, total_time, run_id)
     spark.stop()

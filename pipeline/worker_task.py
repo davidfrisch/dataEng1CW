@@ -1,6 +1,5 @@
 import sys
 import os
-from botocore.exceptions import ClientError
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import PYTHON3_PATH, HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, SRC_DIR
 from pipeline.worker_results_parser import run_hhr_parser
@@ -8,7 +7,6 @@ from pipeline.database import create_session
 from pipeline.models.protein_results import ProteinResults, SUCCESS
 from subprocess import Popen, PIPE
 import sqlalchemy
-import boto3
 
 
 def run_s4pred(input_file, out_file):
@@ -79,22 +77,6 @@ def run_parser(hhr_file, output_file):
     run_hhr_parser(hhr_file, output_file)
     print(f"STEP 4: OUTPUT FILE: {output_file}")
 
-
-def upload_file_to_s3(bucket, file_name, object_name=None):
-    # If S3 object_name was not specified, use file_name
-    if object_name is None:
-        object_name = file_name
-
-    # Create an S3 client
-    s3_client = boto3.client('s3')
-
-    # Upload the file
-    try:
-        response = s3_client.upload_file(file_name, bucket, object_name)
-    except ClientError as e:
-        print("Error uploading file to S3")
-        return False
-    return True
 
 def update_sequence_database(output_file, run_id, identifier):
     """

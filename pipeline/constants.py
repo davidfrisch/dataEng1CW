@@ -12,7 +12,6 @@ PYTHON3_PATH = os.getenv('PYTHON3_PATH')
 HH_SUITE__BIN_PATH = os.getenv('HH_SUITE__BIN_PATH')
 PDB70_PATH = os.getenv('PDB70_PATH')
 S4PRED_PATH = os.getenv('S4PRED_PATH')
-BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 SPARK_MASTER_URL = os.getenv('SPARK_MASTER_URL')
 DATABASE_URL = os.getenv('DATABASE_URL')
 SPARK_LOCAL_UI_URL = os.getenv('SPARK_LOCAL_UI_URL') or 'http://localhost:8080'
@@ -35,10 +34,6 @@ if not S4PRED_PATH:
 
 if not PYTHON3_PATH:
     print("Please set the PYTHON3_PATH in the .env file")
-    sys.exit(1)
-
-if not BUCKET_NAME:
-    print("Please set the BUCKET_NAME in the .env file")
     sys.exit(1)
 
 if not DATABASE_URL:

@@ -1,129 +1,114 @@
-import csv
 import sys
 import os
-import boto3
 from datetime import datetime
+from sqlalchemy.sql import functions
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import ROOT_DIR
 from pipeline.database import create_session
 from pipeline.models.protein_results import ProteinResults
 from pipeline.models.pipeline_run_summary import PipelineRunSummary, SUCCESS
-# Define the indices of the columns in the results file
-QUERY_ID_INDEX = 0
-BEST_HIT_INDEX = 1
-BEST_EVALUE_INDEX = 2
-BEST_SCORE_INDEX = 3
-SCORE_MEAN_INDEX = 4
-SCORE_STD_INDEX = 5
-SCORE_GMEAN_INDEX = 6
 
-def merge_results(bucket, run_id):
+
+def merge_results(run_id):
     """
     Function to merge the results from the individual runs
     """
     print("MERGING RESULTS")
-    s3 = boto3.resource('s3')
-    bucket = s3.Bucket(bucket)
-    results = []
-    # for all files in the folder run_id in the bucket
-    for obj in bucket.objects.filter(Prefix=f"{run_id}/"):
-        print("Reading file: ", obj.key)
-        body = obj.get()['Body'].read().decode('utf-8')
-        lines = body.split("\n")
-        results.extend(lines)
+    session = None
 
-    with open(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", "w") as fh_out:
-        fh_out.write("query_id,best_hit,best_evalue,best_score,score_mean,score_std,score_gmean\n")
-        for line in results:
-            if line != "":
-                fh_out.write(line + "\n")
+    try:
+        session = create_session()
+        protein_results = session.query(ProteinResults).filter(ProteinResults.run_id == run_id).all()
 
-    print(f"Results written to {ROOT_DIR}/output/{run_id}/merge_result.csv")
+        with open(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", "w") as fh_out:
+            fh_out.write("query_id,best_hit,best_evalue,best_score,score_mean,score_std,score_gmean\n")
+            for protein_result in protein_results:
+                fh_out.write(f"{protein_result.query_id},{protein_result.best_hit},{protein_result.best_evalue},{protein_result.best_score},{protein_result.score_mean},{protein_result.score_std},{protein_result.score_gmean}\n")
+            
+            print(f"Results written to {ROOT_DIR}/output/{run_id}/merge_result.csv")
+        
+        session.close()
+    except Exception as e:
+        print("Error while merging results: ", e)
+        session.rollback()
+        session.close()
 
 
 
-def write_best_hits(merged_results_csv, output_file):
+def write_best_hits(output_file, run_id):
     """
     Function to write the best hits to the output file
     """
-    csv_reader = csv.reader(open(merged_results_csv, "r"), delimiter=",")
 
-    # Skip the header row
-    header = next(csv_reader)
-    # Extract query_id and best_hit indices from the header
-    query_id_index = int(header.index('query_id'))
-    best_hit_index = int(header.index('best_hit'))
+    session = None
 
-    if not (isinstance(query_id_index, int) and isinstance(best_hit_index, int)):
-        print("Cannot find query_id and best_hit columns in the results file")
-        raise Exception("Cannot find query_id and best_hit columns in the results file")
+    try:
+        session = create_session()
+        protein_results = session.query(ProteinResults).filter(ProteinResults.run_id == run_id).all()
 
-    # Iterate over the rows and extract query_id and best_hit values
-    best_hits = []
-    for row in csv_reader:
-        best_hits.append((row[query_id_index], row[best_hit_index]))
-
-    # Write the best hits to the output file
-    with open(output_file, "w") as fh_out:
-        fh_out.write("fasta_id,best_hit_id\n")
-        for best_hit in best_hits:
-            fh_out.write(f"{best_hit[0]},{best_hit[1]}\n")
+        with open(output_file, "w") as fh_out:
+            fh_out.write("fasta_id,best_hit_id\n")
+            for protein_result in protein_results:
+                fh_out.write(f"{protein_result.query_id},{protein_result.best_hit}\n")
+            
+            print(f"Best hits written to {output_file}")
+        
+        session.close()
+    except Exception as e:
+        print("Error while writing best hits: ", e)
+        session.rollback()
+        session.close()
 
 
-def get_avg_score_std(merged_results_csv):
+def get_avg_score_std(run_id):
     """
     Function to get the average score standard deviation
     """
-    csv_reader = csv.reader(open(merged_results_csv, "r"), delimiter=",")
-    header = next(csv_reader)
+    session = None
 
-    score_std_index = int(header.index('score_std'))
+    try:
+        session = create_session()
+        # only of run_id
+        score_std_sum = session.query(
+            functions.sum(ProteinResults.score_std)
+        ).filter(ProteinResults.run_id == run_id).scalar()
 
-    if not isinstance(score_std_index, int):
-        print("Cannot find score_std column in the results file")
-        raise Exception("Cannot find score_std column in the results file")
-    
-    score_std = []
-    for row in csv_reader:
-        row_std = str(row[score_std_index])
-        # check if the value is not NaN
-        if row_std.lower() != 'nan':
-            score_std.append(float(row_std))  
+        score_std_count = session.query(
+            functions.count(ProteinResults.score_std)
+        ).filter(ProteinResults.run_id == run_id).scalar()
 
-    if len(score_std) == 0:
-        print("No valid values found in the results file")
-        raise Exception("No valid values found in the results file")
+        avg_score_std = score_std_sum/score_std_count
+        return avg_score_std
 
-    avg_score_std = sum(score_std)/len(score_std)
-    return avg_score_std
+    except Exception as e:
+        print("Error while getting average score standard deviation: ", e)
+        session.rollback()
+        session.close()
 
 
-def get_avg_score_gmean(merged_results_csv):
+def get_avg_score_gmean(run_id):
     """
     Function to get the average score geometric mean
     """
-    csv_reader = csv.reader(open(merged_results_csv, "r"), delimiter=",")
-    header = next(csv_reader)
 
-    score_gmean_index = int(header.index('score_gmean'))
+    session = None
 
-    if not isinstance(score_gmean_index, int):
-        print("Cannot find score_gmean column in the results file")
-        raise Exception("Cannot find score_gmean column in the results file")
-    
-    score_gmean = []
-    for row in csv_reader:
-        row_gmean = str(row[score_gmean_index])
-        # check if the value is not NaN
-        if row_gmean.lower() != 'nan':
-            score_gmean.append(float(row_gmean))  
+    try:
+        session = create_session()
+        score_gmean_sum = session.query(
+            functions.sum(ProteinResults.score_gmean)
+        ).filter(ProteinResults.run_id == run_id).scalar()
+        score_gmean_count = session.query(
+            functions.count(ProteinResults.score_gmean)
+        ).filter(ProteinResults.run_id == run_id).scalar()
 
-    if len(score_gmean) == 0:
-        print("No valid values found in the results file")
-        raise Exception("No valid values found in the results file")
+        avg_score_gmean = score_gmean_sum/score_gmean_count
+        return avg_score_gmean
 
-    avg_score_gmean = sum(score_gmean)/len(score_gmean)
-    return avg_score_gmean
+    except Exception as e:
+        print("Error while getting average score geometric mean: ", e)
+        session.rollback()
+        session.close()
 
 
 def write_profile_csv(avg_score_std, avg_score_gmean, output_file):
@@ -135,7 +120,7 @@ def write_profile_csv(avg_score_std, avg_score_gmean, output_file):
         fh_out.write(f"{avg_score_std},{avg_score_gmean}\n")
     
 
-def save_results_to_db(merged_results_csv, avg_score_std, avg_score_gmean, total_time, run_id):
+def save_results_to_db(avg_score_std, avg_score_gmean, total_time, run_id):
     """
     Function to save the results to the database
     """
