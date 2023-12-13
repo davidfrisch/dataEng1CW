@@ -8,8 +8,8 @@ S3_BUCKET_NAME=comp0235-ucabfri
 SPARK_MASTER_URL=spark://ip-10-0-0-169.eu-west-2.compute.internal:7077
 SPARK_UI_URL="http://ec2-18-130-66-138.eu-west-2.compute.amazonaws.com/spark-master"
 # DOCKER_SPARK_MASTER_URL=spark://spark-master:7077
-DATABASE_URL="postgresql://postgres:postgres@ip-10-0-0-169.eu-west-2.compute.internal:5432/proteomics?schema=public"
-DOCKER_DATABASE_URL="postgresql://postgres:postgres@postgres-db:5432/proteomics?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@ip-10-0-0-169.eu-west-2.compute.internal:5432/proteomics"
+DOCKER_DATABASE_URL="postgresql://postgres:postgres@postgres-db:5432/proteomics"
 SHARE_DIR="/mnt/data/dataEng1CW/data"
 DOCKER_SHARE_DIR="/data"
 VITE_BACKEND_URL="http://localhost:3001"
