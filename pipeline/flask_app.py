@@ -7,6 +7,8 @@ from subprocess import Popen, PIPE
 import requests
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import SPARK_MASTER_URL, ROOT_DIR, SPARK_LOCAL_UI_URL
+from pipeline.save_fasta_from_db import create_fasta_file
+
 app = Flask(__name__)
 CORS(app, origins=['*'])
 
@@ -41,11 +43,16 @@ def launch_pipeline():
     data = request.get_json()
     filepath = data['file_path'] if 'file_path' in data else None
     filename = filepath.split('/')[-1] if filepath else None
-    local_path = f'{ROOT_DIR}/data/{filename}'
+    ids = data['ids'] if 'ids' in data else None
     name = data['name'] if 'name' in data else None
+    local_path = f'{ROOT_DIR}/data/{filename}'
     run_id = name + '_' + str(int(time()))
 
-    if filepath is None:
+    if ids and not filename:
+        local_path = f'{ROOT_DIR}/data/{run_id}.fasta'
+        create_fasta_file(ids, local_path)
+
+    if filepath is None and ids is None:
         return {'error': 'No file path provided'}, 400
 
     if not os.path.exists(local_path):

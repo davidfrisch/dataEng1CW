@@ -1,16 +1,26 @@
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from pipeline.constants import ROOT_DIR
 from pipeline.database import create_session
 from pipeline.models.proteome import Proteomes
 import argparse
 
 
-def get_proteins(list_ids: list):
-    session = create_session()
-    proteins = session.query(Proteomes).filter(Proteomes.id.in_(list_ids)).all()
-    session.close()
+def create_fasta_file(list_ids: list, output_file: str):
+    try:
+        session = create_session()
+        proteins = session.query(Proteomes).filter(Proteomes.id.in_(list_ids)).all()
+        session.close()
+    except Exception as e:
+        print(e)
+  
+    with open(output_file, "w") as f:
+        for protein in proteins:
+            f.write(f">{protein.id}\n{protein.sequence}\n")
+
     return proteins
+
 
 
 if __name__ == "__main__":
@@ -30,31 +40,23 @@ if __name__ == "__main__":
         print("Only one input allowed, either -f or -l")
         exit(0)
 
-
     if args.file:
         with open(args.file, "r") as f:
             list_ids = [line.strip() for line in f.readlines()]
     elif args.list:
         list_ids = args.list.split(",")
 
-
     if not list_ids:
         print("No ids in input")
         exit(0)
 
-    proteins_found = get_proteins(list_ids)
+    output_file = f"{ROOT_DIR}/data/proteins.fasta" if not args.output else args.output    
+    proteins = create_fasta_file(list_ids, output_file)
 
-    if not proteins_found:
-        print("No proteins found")
-        exit(0)
-
-
-    output_file = "./proteins.csv" if not args.output else args.output    
-    with open(output_file, "w") as f:
-        f.write("id,sequence\n")
-        for protein in proteins_found:
-            f.write(f"{protein.id},{protein.sequence}\n")
+    for id in list_ids:
+        if id not in proteins:
+            print(f"Not found: {id}")
     
-    print(f"{len(proteins_found)} / {len(list_ids)} Proteins saved in {output_file}")
+    print(f"{len(proteins)} /{len(list_ids)} Proteins saved in {output_file}")
 
 

@@ -14,7 +14,20 @@ export const RunsController = {
 
   startRun: async (req, res) => {
     try {
-      const { fasta_file_path, process_name } = req.body;
+      const { process_name } = req.body;
+      const fasta_file_path = req.body?.fasta_file_path;
+      const ids = req.body?.ids;
+
+      if (ids?.length > 0) {
+        const run_id = await RunsService.startRunIds(ids, process_name);
+        res.send({ run_id });
+        return;
+      }
+
+      if (!fasta_file_path) {
+        res.status(400).send({ error: "No fasta file path provided" });
+      }
+
       const run_id = await RunsService.startRun(fasta_file_path, process_name);
       res.send({ run_id });
     } catch (e) {

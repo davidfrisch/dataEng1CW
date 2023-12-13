@@ -17,4 +17,14 @@ export const ProteinsController = {
       runs: runs || [],
     });
   },
+
+  getProteins: async (req, res) => {
+    const ids = req.body.ids;
+    if (!ids) {
+      res.status(400).send("No ids provided");
+    }
+    const proteins = await ProteinsService.getProteins(ids);
+
+    res.send(proteins);
+  },
 };

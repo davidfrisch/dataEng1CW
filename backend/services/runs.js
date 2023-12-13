@@ -1,6 +1,6 @@
 import flaskClient from "./flask_client.js";
 import prisma from "./prisma_client.js";
-
+import fs from "fs";
 
 export default {
   getRuns: async () => {
@@ -25,8 +25,16 @@ export default {
     return results;
   },
 
-  startRun: async (fastaFilePath, processName) => {
+  startRunIds: async (ids, processName) => {
+    const res = await flaskClient.post("/launch_pipeline", {
+      ids: ids,
+      name: processName,
+    });
 
+    return res.data.run_id;
+  },
+
+  startRun: async (fastaFilePath, processName) => {
     const res = await flaskClient.post("/launch_pipeline", {
       file_path: fastaFilePath,
       name: processName,
