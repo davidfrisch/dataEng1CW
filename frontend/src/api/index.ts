@@ -11,7 +11,6 @@ export const api = axios.create({
 /* all resquest with runs */
 const getRuns = async () => {
   const res = await api.get("/runs");
-  console.log(res);
   return res;
 };
 const getRun = (id: string) => api.get(`/runs/${id}`);
@@ -43,8 +42,11 @@ const proteins = {
   getProtein: (id: string) => api.get(`/proteins/${id}`),
 };
 
+const health = () => api.get("/health");
+
 export default {
   runs,
   upload,
   proteins,
+  health,
 };
