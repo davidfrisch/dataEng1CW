@@ -11,14 +11,15 @@ const fileTypes = ["fasta", "fa"];
 export default function UploadPage({}: Props) {
   const [file, setFile] = useState<any>(null);
   const [uploadedStatus, setUploadedStatus] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const handleChange = (file: any) => {
     setFile(file);
-    console.log(file)
     setUploadedStatus(null);
   };
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    setLoading(true);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("name", file.name);
@@ -28,13 +29,14 @@ export default function UploadPage({}: Props) {
         setUploadedStatus(res.data);
         console.log(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
   };
 
   const handleRemoveFile = () => {
     setFile(null);
     setUploadedStatus(null);
-  }
+  };
 
   return (
     <div>
@@ -59,6 +61,8 @@ export default function UploadPage({}: Props) {
       <button disabled={!file} onClick={handleSubmit} hidden={uploadedStatus}>
         Submit
       </button>
+
+      {loading && <p>Uploading...</p>}
 
       {uploadedStatus?.protein_status?.length && (
         <div>
@@ -105,9 +109,11 @@ export default function UploadPage({}: Props) {
           </ul>
         </div>
       )}
-      {uploadedStatus?.fasta_file_path && <div>
-        <StartRunForm fasta_file_path={uploadedStatus?.fasta_file_path} />
-      </div>}
+      {uploadedStatus?.fasta_file_path && (
+        <div>
+          <StartRunForm fasta_file_path={uploadedStatus?.fasta_file_path} />
+        </div>
+      )}
     </div>
   );
 }

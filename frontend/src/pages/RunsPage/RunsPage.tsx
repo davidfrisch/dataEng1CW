@@ -54,7 +54,7 @@ export default function RunsPage() {
                   </td>
                   <td>{runResults.author}</td>
                   <td>{runResults?.date_started?.split(".")[0]}</td>
-                  <td>{runResults.status === "SUCCESS" ? (Math.floor(runResults.execution_time / 60) + "m " + (runResults.execution_time % 60).toFixed(0) + "s") : runResults.status}</td>
+                  <td>{runResults.status === "SUCCESS" ? (Math.floor(runResults.duration / 60) + "m " + (runResults.duration % 60).toFixed(0) + "s") : runResults.status}</td>
                 </tr>
               ))}
           </tbody>

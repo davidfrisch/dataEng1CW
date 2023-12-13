@@ -31,7 +31,7 @@ export default function SearchPage({}: Props) {
   return (
     <div>
       <h1>Search Protein</h1>
-      <p>Search for a protein by giving it's id</p>
+      <p>Search for a protein by giving its id</p>
       <input
         type="text"
         placeholder="Protein ID"

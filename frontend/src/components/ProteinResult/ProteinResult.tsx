@@ -26,13 +26,13 @@ export default function ProteinResult({ proteinResult }: Props) {
         ID: {query_id}
       </div>
      {status === "SUCCESS" && <div className="protein-container">
-        <img
+        {best_hit && <img
           src={`https://cdn.rcsb.org/images/structures/${best_hit
             .split("_")[0]
             .toLowerCase()}_assembly-1.jpeg`}
           alt={`protein_${best_hit.split("_")[0]}`}
           style={{ width: "8rem", height: "8rem" }}
-        />
+        />}
         <div className="best-item">
           <h4>Best E-Value</h4>
           <p>{best_evalue}</p>
@@ -58,7 +58,7 @@ export default function ProteinResult({ proteinResult }: Props) {
           <p>{score_std}</p>
         </div>
         <div className="actions">
-          <button>
+          {best_hit && <button>
             <a
               href={`https://www.rcsb.org/sequence/${best_hit.split("_")[0]}#${
                 best_hit.split("_")[1]
@@ -68,7 +68,7 @@ export default function ProteinResult({ proteinResult }: Props) {
             >
               See in RCSB
             </a>
-          </button>
+          </button>}
         </div>
       </div>}
     </div>
