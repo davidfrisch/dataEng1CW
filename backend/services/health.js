@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import flask_client from "./flask_client.js";
+import prisma from "./prisma_client.js";
 
 export default {
   getHealthFlask: async () => {
@@ -14,7 +14,7 @@ export default {
 
   getHealthPrisma: async () => {
     try {
-      await new PrismaClient().$connect();
+      await prisma.$connect();
       return { status: "ALIVE" };
     } catch (error) {
       return false;

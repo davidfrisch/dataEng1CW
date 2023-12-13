@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import flaskClient from "./flask_client.js";
+import prisma from "./prisma_client.js";
 
-const prisma = new PrismaClient();
 
 export default {
   getRuns: async () => {

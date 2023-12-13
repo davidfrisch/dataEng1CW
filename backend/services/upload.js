@@ -1,6 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { STATUS_UPLOAD } from "../constants.js";
-const prisma = new PrismaClient();
+import prisma from "./prisma_client.js";
 
 export default {
   saveProteines: async (proteines) => {
