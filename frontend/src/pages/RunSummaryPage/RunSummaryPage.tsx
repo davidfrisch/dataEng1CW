@@ -56,7 +56,7 @@ export default function RunSummaryPage() {
         <div className="run-summary">
           <div className="run-summary-header">
             <h2>Run Summary</h2>
-            <button hidden={!runId} onClick={downloadRunResults} className="btn btn-primary">
+            <button hidden={runSummary.status !== "SUCCESS" } onClick={downloadRunResults} className="btn btn-primary">
               Download
             </button>
           </div>
@@ -70,10 +70,10 @@ export default function RunSummaryPage() {
             <div className="run-summary-item-container">
               <div className="run-summary-title-item">Run time</div>
               <div className="run-summary-item">
-                {Math.floor(runSummary.duration / 60) +
+                {runSummary.status === "SUCCESS" ? Math.floor(runSummary.duration / 60) +
                   "m " +
                   (runSummary.duration % 60).toFixed(0) +
-                  "s"}
+                  "s" : runSummary.status}
               </div>
             </div>
 
@@ -88,8 +88,8 @@ export default function RunSummaryPage() {
             </div>
 
             <div className="run-summary-item-container">
-              <div className="run-summary-title-item">Finished at</div>
-              <div className="run-summary-item">{runSummary.date_finished}</div>
+              <div className="run-summary-title-item">Created at</div>
+              <div className="run-summary-item">{runSummary?.date_started?.split('.')[0]}</div>
             </div>
 
             <div className="run-summary-item-container">

@@ -8,6 +8,7 @@ export default function ProteinResult({ proteinResult }: Props) {
   const {
     best_evalue,
     best_hit,
+    status,
     best_score,
     score_gmean,
     score_std,
@@ -16,8 +17,15 @@ export default function ProteinResult({ proteinResult }: Props) {
 
   return (
     <div className="proteins-result-container">
-      <div className="title-id">ID: {query_id}</div>
-      <div className="protein-container">
+      <div className="title-id">
+        <div
+          className={`status-circle ${
+            status === "SUCCESS" ? "success" : status === "RUNNING" ? "running" : "pending"
+          }`}
+        ></div>
+        ID: {query_id}
+      </div>
+     {status === "SUCCESS" && <div className="protein-container">
         <img
           src={`https://cdn.rcsb.org/images/structures/${best_hit
             .split("_")[0]
@@ -62,7 +70,7 @@ export default function ProteinResult({ proteinResult }: Props) {
             </a>
           </button>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

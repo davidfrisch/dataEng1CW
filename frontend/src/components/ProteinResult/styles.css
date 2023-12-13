@@ -12,7 +12,9 @@
 }
 
 .title-id{
+  display: flex;
   margin: 0;
+  margin-bottom: 12px;
   padding: 0;
   font-size: 18px;
   font-weight: 500;
@@ -33,3 +35,21 @@
   align-items: end;
 }
 
+.status-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.success {
+  background-color: #4caf50;
+}
+
+.running {
+  background-color: #ff9800;
+}
+
+.pending {
+  background-color: #9e9e9e;
+}

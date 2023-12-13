@@ -1,5 +1,6 @@
 export type protein_result = {
   run_id: string;
+  status: string;
   query_id: string;
   best_hit: float;
   best_evalue: float;

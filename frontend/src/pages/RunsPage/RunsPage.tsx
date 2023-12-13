@@ -2,9 +2,8 @@ import React from "react";
 import api from "../../api";
 import "./styles.css";
 
-type Props = {};
 
-export default function RunsPage({}: Props) {
+export default function RunsPage() {
   const [runResults, setRunResults] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
@@ -54,8 +53,8 @@ export default function RunsPage({}: Props) {
                     </a>
                   </td>
                   <td>{runResults.author}</td>
-                  <td>{runResults.date_finished.split(".")[0]}</td>
-                  <td>{(Math.floor(runResults.duration / 60) + "m " + (runResults.duration % 60).toFixed(0) + "s")}</td>
+                  <td>{runResults?.date_started?.split(".")[0]}</td>
+                  <td>{runResults.status === "SUCCESS" ? (Math.floor(runResults.execution_time / 60) + "m " + (runResults.execution_time % 60).toFixed(0) + "s") : runResults.status}</td>
                 </tr>
               ))}
           </tbody>
