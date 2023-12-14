@@ -12,9 +12,6 @@
     ssh-add /home/ec2-user/.ssh/david_student_key
 
 
-- name: read ~/.bashrc
-  shell: cat ~/.bashrc
-  register: bashrc_contents
 
 - name: Add to .bashrc ssh-add
   when: user_accts.stdout.find("ssh-add") == -1

@@ -49,7 +49,6 @@ spark_group: ec2-user
 
 
 # Software installation
-sudo yum install bind-utils
 python3 -m ensurepip --upgrade
 python3 -m pip install --upgrade pip
 pip3 install ansible

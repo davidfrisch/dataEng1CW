@@ -15,6 +15,11 @@
     accept_hostkey: yes
     key_file: /home/ec2-user/.ssh/david_student_key
 
+- name: Install nslookup with yum
+  yum:
+    name: bind-utils
+    state: present
+
 - name: Update env vars 
   shell: |
     cd {{ repo_dir }} && ./scripts/setup_local_env.sh --hostname {{ groups['client'][0] }}
