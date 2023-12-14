@@ -17,7 +17,7 @@
 
 - name: Update env vars 
   shell: |
-    cd {{ repo_dir }} && ./scripts/setup_local_env.sh
+    cd {{ repo_dir }} && ./scripts/setup_local_env.sh --hostname {{ groups['client'][0] }}
 
 - name: install requirements
   shell: |

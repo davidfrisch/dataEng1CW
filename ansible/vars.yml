@@ -1,12 +1,15 @@
 
 my_region: eu-west-2
+
 # git vars
 git_repo: git@github.com:davidfrisch/dataEng1CW.git
 repo_dir: /mnt/data/dataEng1CW
+
 # hh-suite vars
 hh_suite_dir: /mnt/data/programs/hh-suite
 hh_suite_file: hhsuite-3.3.0-AVX2-Linux.tar.gz
 hh_suite_url: https://github.com/soedinglab/hh-suite/releases/download/v3.3.0/hhsuite-3.3.0-AVX2-Linux.tar.gz
+
 # s4pred vars
 s4pred_dir: /mnt/data/programs/s4pred
 
@@ -18,11 +21,3 @@ spark_download_url: https://dlcdn.apache.org/spark/spark-3.5.0/spark-3.5.0-bin-h
 spark_folder_name: spark-3.5.0-bin-hadoop3
 spark_download_dest: /opt/spark.tgz
 spark_install_dir: /opt
-spark_user: ec2-user
-spark_group: ec2-user
-## More workers can be added in the roles/master/tasks/set_spark_envs.yml file
-ssh_private_key: ~/.ssh/david_student_key
-spark_worker_1: ec2-user@ec2-18-169-22-125.eu-west-2.compute.amazonaws.com
-spark_worker_2: ec2-user@ec2-18-134-114-147.eu-west-2.compute.amazonaws.com
-spark_worker_3: ec2-user@ec2-35-178-241-218.eu-west-2.compute.amazonaws.com
-spark_worker_4: ec2-user@ec2-35-177-190-96.eu-west-2.compute.amazonaws.com
