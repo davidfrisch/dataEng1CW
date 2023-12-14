@@ -31,10 +31,11 @@ def hello_world():
 @app.route('/health')
 def health():
     try:
-        spark_info = requests.get(f'{SPARK_LOCAL_UI_URL}/json/')
+        spark_info = requests.get(f'{SPARK_LOCAL_UI_URL}/json')
         return {'flask': {'status': "ALIVE"}, 'spark': spark_info.json()}
     except Exception as e:
-        return {'status': 'error', 'error': str(e), 'spark_master_url': SPARK_MASTER_URL, 'spark': 'error'}
+        print(e)
+        return {'flask': {'status': "ALIVE"}, 'spark': {'status': 'DOWN', 'error': str(e)}}
 
 
 

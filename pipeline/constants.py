@@ -14,7 +14,7 @@ PDB70_PATH = os.getenv('PDB70_PATH')
 S4PRED_PATH = os.getenv('S4PRED_PATH')
 SPARK_MASTER_URL = os.getenv('SPARK_MASTER_URL')
 DATABASE_URL = os.getenv('DATABASE_URL')
-SPARK_LOCAL_UI_URL = os.getenv('SPARK_LOCAL_UI_URL') or 'http://localhost:8080'
+SPARK_LOCAL_UI_URL = os.getenv('SPARK_LOCAL_UI_URL') 
 
 if not SPARK_MASTER_URL:
     print("Please set the SPARK_MASTER_URL in the .env file")
@@ -38,6 +38,10 @@ if not PYTHON3_PATH:
 
 if not DATABASE_URL:
     print("Please set the DATABASE_URL in the .env file")
+    sys.exit(1)
+
+if not SPARK_LOCAL_UI_URL:
+    print("Please set the SPARK_LOCAL_UI_URL in the .env file")
     sys.exit(1)
 
 os.environ['PYSPARK_DRIVER_PYTHON'] = PYTHON3_PATH
