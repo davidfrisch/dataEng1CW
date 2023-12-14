@@ -44,9 +44,7 @@ export default function UploadPage() {
   return (
     <div>
       <h1>Drop the fasta file like if it is hot !</h1>
-      <p>
-        Add a fasta file to upload the ids with their sequences. 
-      </p>
+      <p>Add a fasta file to upload the ids with their sequences.</p>
       <div hidden={file}>
         <FileUploader
           multiple={false}
@@ -106,7 +104,7 @@ export default function UploadPage() {
                 (currentPage - 1) * itemsPerPage,
                 currentPage * itemsPerPage
               )
-              .map((seq) => (
+              .map((seq: any) => (
                 <li
                   key={seq.id}
                   style={{ display: "flex", alignItems: "center" }}

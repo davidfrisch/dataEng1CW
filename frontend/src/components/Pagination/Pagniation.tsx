@@ -1,4 +1,4 @@
-import ReactPaginate from "react-paginate";
+import ReactPaginate from "react-paginate"; 
 import "./styles.css";
 
 type Props = {
@@ -12,7 +12,7 @@ export default function Pagniation({
   itemsPerPage,
   totalLenghth,
 }: Props) {
-  const handlePageClick = (event) => {
+  const handlePageClick = (event: any) => {
     const newOffset = (event.selected + 1) * itemsPerPage;
     console.log(
       `User requested page number ${event.selected}, which is offset ${newOffset}`

@@ -24,6 +24,8 @@ export default function NewRunPage() {
     setFile(file);
     const reader = new FileReader();
     reader.onload = async (e) => {
+      if(!e.target) return;
+
       const text = e.target.result;
       if (typeof text !== "string") {
         return;

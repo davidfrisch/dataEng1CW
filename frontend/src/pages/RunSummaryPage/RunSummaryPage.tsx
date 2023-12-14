@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ListOfProteins from "../../components/ListOfProteins";
 import api from "../../api";
 import { useParams } from "react-router-dom";
