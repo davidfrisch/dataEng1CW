@@ -132,3 +132,16 @@ def update_db_status(run_id, identifier, status):
         print(f"Updated status of {identifier} to {status}")
     except Exception as e:
         print("Error while updating database: ", e)
+
+
+def clean_up_tmp_files(tmp_file, horiz_file, a3m_file, hhr_file):
+    """
+    Clean up the tmp files
+    """
+    try:
+        os.remove(tmp_file)
+        os.remove(horiz_file)
+        os.remove(a3m_file)
+        os.remove(hhr_file)
+    except Exception as e:
+        print("Error while deleting tmp files: ", e)

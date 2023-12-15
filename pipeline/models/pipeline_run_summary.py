@@ -5,12 +5,14 @@ Base = declarative_base()
 
 SUCCESS = 'SUCCESS'
 RUNNING = 'RUNNING'
+FAILED = 'FAILED'
+PENDING=  'PENDING'
 
 
 class PipelineRunSummary(Base):
     __tablename__ = 'pipeline_run_summary'
     run_id = Column(String, primary_key=True)
-    status = Column(Enum(SUCCESS, RUNNING, name="status"), nullable=False)
+    status = Column(Enum(SUCCESS, RUNNING, FAILED, PENDING, name="status"), nullable=False)
     duration = Column(Float)
     score_std = Column(Float)
     score_gmean = Column(Float)
