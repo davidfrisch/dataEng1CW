@@ -13,10 +13,6 @@ export default function Pagniation({
   totalLenghth,
 }: Props) {
   const handlePageClick = (event: any) => {
-    const newOffset = (event.selected + 1) * itemsPerPage;
-    console.log(
-      `User requested page number ${event.selected}, which is offset ${newOffset}`
-    );
     setCurrentPage(event.selected + 1);
   };
 
