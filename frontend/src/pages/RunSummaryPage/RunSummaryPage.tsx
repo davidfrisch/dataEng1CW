@@ -7,6 +7,12 @@ import "./styles.css";
 import Pagniation from "../../components/Pagination/Pagniation";
 
 const itemsPerPage = 10;
+const COLOR_MAP = {
+  SUCCESS: "green",
+  FAILED: "red",
+  PENDING: "gray",
+  RUNNING: "yellow",
+} as { [key: string]: string };
 
 export default function RunSummaryPage() {
   const { runId } = useParams();
@@ -19,8 +25,8 @@ export default function RunSummaryPage() {
       const response = await api.runs.getRun(id);
       console.log(response);
       const json = await response.data;
-      const { proteins, run_summary } = json;
-      setRunSummary(run_summary);
+      const { proteins, run_summary, progress } = json;
+      setRunSummary({ ...run_summary, progress });
       setRunResults(proteins);
     } catch (err: any) {
       console.error(err.message);
@@ -31,11 +37,13 @@ export default function RunSummaryPage() {
     if (!runId) return;
 
     try {
-      const csvFile = await api.runs.downloadRun(runId);
-      const url = window.URL.createObjectURL(new Blob([csvFile.data]));
+      const csvFileRes = await api.runs.downloadRun(runId);
+      const { data: blob } = csvFileRes;
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
+      const filename = `results_${runId}.zip`;
       link.href = url;
-      link.setAttribute("download", "run_results.csv");
+      link.setAttribute("download", filename);
       document.body.appendChild(link);
       link.click();
     } catch (err: any) {
@@ -67,6 +75,25 @@ export default function RunSummaryPage() {
             >
               Download
             </button>
+          </div>
+          <div>
+            {runSummary.progress && (
+              <div className="run-summary-progress-container">
+                {Object.entries(runSummary.progress).map(([name, value]) => (
+                  <div key={name} className="run-summary-progress-item">
+                    <div
+                      className="run-summary-progress-item-title"
+                      style={{ color: COLOR_MAP[name] }}
+                    >
+                      {name.toUpperCase()}
+                    </div>
+                    <div className="run-summary-progress-item-value">
+                      {value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="run-summary-container">

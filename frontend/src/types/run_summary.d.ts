@@ -7,4 +7,5 @@ export interface run_summary {
   date_started: string;
   date_finished: string;
   author: string;
+  progress: {total: number, "SUCCESS": number, "FAILED": number, "PENDING": number, "RUNNING": number}
 }

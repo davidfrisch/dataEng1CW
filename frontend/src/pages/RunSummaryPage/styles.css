@@ -12,6 +12,19 @@
   margin-bottom: 20px;
 }
 
+.run-summary-progress-container{
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.run-summary-progress-item{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 20px;
+}
+
 .run-summary-item-container {
   display: flex;
   flex-direction: column;
