@@ -8,9 +8,33 @@ import admZip from "adm-zip";
 export default {
   updateRuns: async () => {
     try {
-      const sparkStatus = await HealthService.getHealthFlask();
-      const { activeapps } = sparkStatus;
-      console.log(sparkStatus);
+      const flaskStauts = await HealthService.getHealthFlask();
+      const { spark } = flaskStauts;
+      const { activeapps, completedapps } = spark;
+      const activeAppsName = activeapps.map((app) => app.name);
+      const completedAppsName = completedapps.map((app) => app.name);
+
+      const runsRunning = await prisma.pipeline_run_summary.findMany({
+        where: {
+          status: "RUNNING",
+        },
+      });
+
+      for (const run of runsRunning) {
+        if (
+          !activeAppsName.includes(run.run_id) &&
+          !completedAppsName.includes(run.run_id)
+        ) {
+          await prisma.pipeline_run_summary.update({
+            where: {
+              run_id: run.run_id,
+            },
+            data: {
+              status: "FAILED",
+            },
+          });
+        }
+      }
     } catch (error) {
       console.log(error);
     }
@@ -70,7 +94,7 @@ export default {
     const header = Object.keys(proteins[0]).join(",");
     const rows = proteins.map((row) => Object.values(row).join(","));
     const filename = `results_db.csv`;
-    const output = `${SHARE_DIR}/output/${run_id}/merge_results_db.zip`
+    const output = `${SHARE_DIR}/output/${run_id}/merge_results_db.zip`;
     fs.writeFileSync(
       `${SHARE_DIR}/output/${run_id}/${filename}`,
       [header, ...rows].join("\n")
