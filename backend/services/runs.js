@@ -1,8 +1,21 @@
+import fs from "fs";
 import flaskClient from "./flask_client.js";
 import prisma from "./prisma_client.js";
-import fs from "fs";
+import HealthService from "./health.js";
+import { SHARE_DIR } from "../constants.js";
+import admZip from "adm-zip";
 
 export default {
+  updateRuns: async () => {
+    try {
+      const sparkStatus = await HealthService.getHealthFlask();
+      const { activeapps } = sparkStatus;
+      console.log(sparkStatus);
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
   getRuns: async () => {
     const runs = await prisma.pipeline_run_summary.findMany({
       orderBy: {
@@ -53,10 +66,30 @@ export default {
     return results;
   },
 
-  toCSV: (proteins) => {
+  toCSVZip: async (proteins, run_id) => {
     const header = Object.keys(proteins[0]).join(",");
     const rows = proteins.map((row) => Object.values(row).join(","));
-    return [header, ...rows].join("\n");
+    const filename = `results_db.csv`;
+    const output = `${SHARE_DIR}/output/${run_id}/merge_results_db.zip`
+    fs.writeFileSync(
+      `${SHARE_DIR}/output/${run_id}/${filename}`,
+      [header, ...rows].join("\n")
+    );
+    const zip = new admZip();
+    zip.addLocalFile(`${SHARE_DIR}/output/${run_id}/${filename}`);
+    zip.writeZip(output);
+
+    return fs.readFileSync(output);
+  },
+
+  getZipFile: async (run_id) => {
+    try {
+      const file = fs.readFileSync(`${SHARE_DIR}/output/${run_id}/results.zip`);
+      return file;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   },
 
   getRunsByProteinId: async (protein_id) => {

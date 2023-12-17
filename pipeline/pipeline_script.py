@@ -9,7 +9,7 @@ from pipeline_argparser import argparser
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR
 from pipeline.worker_task import run_s4pred, read_horiz, run_hhsearch, run_parser, update_sequence_database, update_db_status, clean_up_tmp_files
-from pipeline.master_task import merge_results, write_best_hits, write_profile_csv, save_results_to_db, get_avg_score_gmean, get_avg_score_std
+from pipeline.master_task import merge_results, write_best_hits, write_profile_csv, save_results_to_db, get_avg_score_gmean, get_avg_score_std, zip_results
 import zipfile
 from pipeline.database import create_session
 from pipeline.models.protein_results import ProteinResults, PENDING
@@ -59,7 +59,7 @@ def process_sequence(identifier, sequence, run_id, index):
     a3m_file = f"{ROOT_DIR}/tmp/{run_id}/a3m/{index}.a3m"
     hhr_file = f"{ROOT_DIR}/tmp/{run_id}/a3m/{index}.hhr"
     object_name = f"{run_id}/{index}.out"
-    output_file = f"{ROOT_DIR}/output/{run_id}/{index}.out"
+    output_file = f"{ROOT_DIR}/data/output/{run_id}/{index}.out"
 
     # Early exit if the folders are not set up correctly
     if not os.path.exists(HH_SUITE__BIN_PATH):
@@ -117,13 +117,17 @@ if __name__ == "__main__":
     if not (master_url or args.local):
         print("Please set the spark master with --master or run locally with --local")
         sys.exit(1)
+
+    if master_url == "local[*]":
+        num_workers = 1
+    
     
     spark = SparkSession.builder.appName(run_id).master(master_url).getOrCreate()
     path_to_pipeline_zip = zip_module()
     spark.sparkContext.addPyFile(path_to_pipeline_zip)
   
     
-    os.makedirs(f"{ROOT_DIR}/output/{run_id}", exist_ok=True)
+    os.makedirs(f"{ROOT_DIR}/data/output/{run_id}", exist_ok=True)
     
     print("SPARK SESSION STARTED on ", master_url)
     print("START RUN ID: ", run_id)
@@ -156,11 +160,16 @@ if __name__ == "__main__":
     parallelised_data = spark.sparkContext.parallelize(sequence_list, numSlices=num_workers)
     parallelised_data.foreach(lambda x: process_sequence(x[0], x[1], run_id,  sequence_list.index(x)))
 
-    merge_results(run_id)
-    write_best_hits(f"{ROOT_DIR}/output/{run_id}/best_hits_output.csv", run_id)
+    merge_results_path = f"{ROOT_DIR}/data/output/{run_id}/merge_results.csv"
+    profile_path = f"{ROOT_DIR}/data/output/{run_id}/profile.csv"
+    best_hits_path = f"{ROOT_DIR}/data/output/{run_id}/best_hits.csv"
+
+    merge_results(run_id, merge_results_path)
+    write_best_hits(best_hits_path, run_id)
     avg_score_std = get_avg_score_std(run_id)
     avg_score_gmean = get_avg_score_gmean(run_id)
-    write_profile_csv(avg_score_std, avg_score_gmean,  f"{ROOT_DIR}/output/{run_id}/profile_output.csv")
+    write_profile_csv(avg_score_std, avg_score_gmean, profile_path)
     total_time = time.time() - start_time
     save_results_to_db(avg_score_std, avg_score_gmean, total_time, run_id)
+    zip_results(run_id, merge_results_path, profile_path, best_hits_path)
     spark.stop()

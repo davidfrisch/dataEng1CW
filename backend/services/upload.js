@@ -16,7 +16,7 @@ export default {
         proteines_status.push({ id, status: STATUS_UPLOAD.SUCCESS });
       } catch (error) {
         if (error.code === "P2002") {
-          console.log("Data already exists");
+          console.log(`Proteine ${id} already exist`);
           proteines_status.push({ id, status: STATUS_UPLOAD.ALREADY_EXIST });
         } else {
           console.log(error);

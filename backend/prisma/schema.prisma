@@ -8,8 +8,8 @@ datasource db {
 }
 
 model protein_results {
-  run_id      String  @db.VarChar
   query_id    String  @db.VarChar
+  run_id      String  @db.VarChar
   status      status
   best_hit    String? @db.VarChar
   best_evalue Float?
@@ -18,7 +18,7 @@ model protein_results {
   score_std   Float?
   score_gmean Float?
 
-  @@id([run_id, query_id])
+  @@id([query_id, run_id])
 }
 
 model proteomes {
@@ -40,5 +40,6 @@ model pipeline_run_summary {
 enum status {
   SUCCESS
   RUNNING
+  FAILED
   PENDING
 }

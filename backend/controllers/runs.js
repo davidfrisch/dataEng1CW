@@ -1,4 +1,6 @@
 import RunsService from "../services/runs.js";
+import { status } from "@prisma/client";
+
 
 export const RunsController = {
   getRuns: async (req, res) => {
@@ -9,7 +11,13 @@ export const RunsController = {
   getRun: async (req, res) => {
     const proteins = await RunsService.getProteins(req.params.run_id);
     const run_summary = await RunsService.getRunSummary(req.params.run_id);
-    res.send({ proteins, run_summary });
+    const progress = proteins.reduce((acc, protein) => {
+      acc.total += 1;
+      acc[protein.status] += 1;
+      return acc;
+    }, { total: 0, [status.PENDING]: 0, [status.RUNNING]: 0, [status.SUCCESS]: 0, [status.FAILED]: 0 });
+
+    res.send({ proteins, run_summary, progress });
   },
 
   startRun: async (req, res) => {
@@ -38,11 +46,21 @@ export const RunsController = {
 
   downloadRun: async (req, res) => {
     const run_id = req.params.run_id;
+    const zipFile = await RunsService.getZipFile(run_id);
 
-    const proteins = await RunsService.getProteins(run_id);
-    const csv = RunsService.toCSV(proteins);
-    res.setHeader(`Content-disposition`, `attachment; filename=${run_id}.csv`);
-    res.set("Content-Type", "text/csv");
-    res.status(200).send(csv);
+    // If zip doesn't exist, return zip only with merged csv
+    if (!zipFile) {
+      console.log("No zip file, returning csv in zip");
+      const proteins = await RunsService.getProteins(run_id);
+      const csvZIP = await RunsService.toCSVZip(proteins, run_id);
+      res.setHeader(`Content-disposition`, `attachment; filename=${run_id}.zip`);
+      res.set("Content-Type", "application/zip");
+      res.status(200).send(csvZIP);
+      return
+    }
+
+    res.setHeader(`Content-disposition`, `attachment; filename=${run_id}.zip`);
+    res.set("Content-Type", "application/zip");
+    res.status(200).send(zipFile);
   },
 };

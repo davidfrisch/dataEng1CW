@@ -1,6 +1,7 @@
 import sys
 import os
 from datetime import datetime
+import zipfile
 from sqlalchemy.sql import functions
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pipeline.constants import ROOT_DIR
@@ -9,7 +10,7 @@ from pipeline.models.protein_results import ProteinResults
 from pipeline.models.pipeline_run_summary import PipelineRunSummary, SUCCESS
 
 
-def merge_results(run_id):
+def merge_results(run_id, output_file):
     """
     Function to merge the results from the individual runs
     """
@@ -20,12 +21,12 @@ def merge_results(run_id):
         session = create_session()
         protein_results = session.query(ProteinResults).filter(ProteinResults.run_id == run_id).all()
 
-        with open(f"{ROOT_DIR}/output/{run_id}/merge_result.csv", "w") as fh_out:
+        with open(output_file, "w") as fh_out:
             fh_out.write("query_id,best_hit,best_evalue,best_score,score_mean,score_std,score_gmean\n")
             for protein_result in protein_results:
                 fh_out.write(f"{protein_result.query_id},{protein_result.best_hit},{protein_result.best_evalue},{protein_result.best_score},{protein_result.score_mean},{protein_result.score_std},{protein_result.score_gmean}\n")
             
-            print(f"Results written to {ROOT_DIR}/output/{run_id}/merge_result.csv")
+            print(f"Results written to {output_file}")
         
         session.close()
     except Exception as e:
@@ -145,3 +146,15 @@ def save_results_to_db(avg_score_std, avg_score_gmean, total_time, run_id):
         
     session.close()
     print("RESULTS SAVED TO DATABASE")
+
+def zip_results(run_id: str, merge_file, profile_file, best_hits_file):
+    """
+    Function to zip the results
+    """
+    print("ZIPPING RESULTS")
+    zip_file = f"{ROOT_DIR}/data/output/{run_id}/results.zip"
+    with zipfile.ZipFile(zip_file, 'w') as zip:
+        zip.write(merge_file, os.path.basename(merge_file))
+        zip.write(profile_file, os.path.basename(profile_file))
+        zip.write(best_hits_file, os.path.basename(best_hits_file))
+    print(f"ZIPPED RESULTS TO {zip_file}")
