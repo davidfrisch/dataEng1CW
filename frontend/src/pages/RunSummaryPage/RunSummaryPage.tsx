@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { run_summary } from "../../types/run_summary";
 import "./styles.css";
 import Pagniation from "../../components/Pagination/Pagniation";
+import Timer from "../../components/Timer/Timer";
 
 const itemsPerPage = 10;
 const COLOR_MAP = {
@@ -68,6 +69,18 @@ export default function RunSummaryPage() {
         <div className="run-summary">
           <div className="run-summary-header">
             <h2>Run Summary</h2>
+            {runSummary.status === "RUNNING" && (
+              <Timer startDateTime={runSummary.date_started} />
+            )}
+            {runSummary.status === "FAILED" ||
+            runSummary.status === "SUCCESS" && (
+              <div className="run-rummary-total-time">
+                {Math.floor(runSummary.duration / 60) +
+                  "m " +
+                  (runSummary.duration % 60).toFixed(0) +
+                  "s"}
+              </div>
+            )}
             <button
               hidden={runSummary.status !== "SUCCESS"}
               onClick={downloadRunResults}
