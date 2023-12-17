@@ -11,7 +11,7 @@ import { HealthRouter } from "./routes/health.js";
 const app = express();
 app.use(cors());
 app.use(helmet());
-app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.json({ limit: "100mb" }));
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
