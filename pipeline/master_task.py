@@ -8,13 +8,13 @@ from pipeline.constants import ROOT_DIR
 from pipeline.database import create_session
 from pipeline.models.protein_results import ProteinResults
 from pipeline.models.pipeline_run_summary import PipelineRunSummary, SUCCESS
-
+from pipeline.logger import logger
 
 def merge_results(run_id, output_file):
     """
     Function to merge the results from the individual runs
     """
-    print("MERGING RESULTS")
+    logger.info("MERGING RESULTS")
     session = None
 
     try:
@@ -26,11 +26,11 @@ def merge_results(run_id, output_file):
             for protein_result in protein_results:
                 fh_out.write(f"{protein_result.query_id},{protein_result.best_hit},{protein_result.best_evalue},{protein_result.best_score},{protein_result.score_mean},{protein_result.score_std},{protein_result.score_gmean}\n")
             
-            print(f"Results written to {output_file}")
+            logger.info(f"Results written to {output_file}")
         
         session.close()
     except Exception as e:
-        print("Error while merging results: ", e)
+        logger.error("Error while merging results: ", e)
         session.rollback()
         session.close()
 
@@ -52,11 +52,11 @@ def write_best_hits(output_file, run_id):
             for protein_result in protein_results:
                 fh_out.write(f"{protein_result.query_id},{protein_result.best_hit}\n")
             
-            print(f"Best hits written to {output_file}")
+            logger.info(f"Best hits written to {output_file}")
         
         session.close()
     except Exception as e:
-        print("Error while writing best hits: ", e)
+        logger.error("Error while writing best hits: ", e)
         session.rollback()
         session.close()
 
@@ -82,7 +82,7 @@ def get_avg_score_std(run_id):
         return avg_score_std
 
     except Exception as e:
-        print("Error while getting average score standard deviation: ", e)
+        logger.error("Error while getting average score standard deviation: ", e)
         session.rollback()
         session.close()
 
@@ -107,7 +107,7 @@ def get_avg_score_gmean(run_id):
         return avg_score_gmean
 
     except Exception as e:
-        print("Error while getting average score geometric mean: ", e)
+        logger.error("Error while getting average score geometric mean: ", e)
         session.rollback()
         session.close()
 
@@ -125,7 +125,7 @@ def save_results_to_db(avg_score_std, avg_score_gmean, total_time, run_id):
     """
     Function to save the results to the database
     """
-    print("SAVING RESULTS TO DATABASE")
+    logger.info("SAVING RESULTS TO DATABASE")
     session = None
    
     try:
@@ -141,20 +141,20 @@ def save_results_to_db(avg_score_std, avg_score_gmean, total_time, run_id):
         session.add(new_pipeline_run_summary)
         session.commit()
     except Exception as e:
-        print("Error while updating database: ", e)
+        logger.error("Error while updating database: ", e)
         session.rollback()
         
     session.close()
-    print("RESULTS SAVED TO DATABASE")
+    logger.info("RESULTS SAVED TO DATABASE")
 
 def zip_results(run_id: str, merge_file, profile_file, best_hits_file):
     """
     Function to zip the results
     """
-    print("ZIPPING RESULTS")
+    logger.info("ZIPPING RESULTS")
     zip_file = f"{ROOT_DIR}/data/output/{run_id}/results.zip"
     with zipfile.ZipFile(zip_file, 'w') as zip:
         zip.write(merge_file, os.path.basename(merge_file))
         zip.write(profile_file, os.path.basename(profile_file))
         zip.write(best_hits_file, os.path.basename(best_hits_file))
-    print(f"ZIPPED RESULTS TO {zip_file}")
+    logger.info(f"ZIPPED RESULTS TO {zip_file}")

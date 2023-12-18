@@ -5,9 +5,22 @@ from pipeline.constants import PYTHON3_PATH, HH_SUITE__BIN_PATH, PDB70_PATH, S4P
 from pipeline.worker_results_parser import run_hhr_parser
 from pipeline.database import create_session
 from pipeline.models.protein_results import ProteinResults, SUCCESS
+from pipeline.logger import logger
 from subprocess import Popen, PIPE
 import sqlalchemy
 
+def check_if_already_ran(identifier, run_id):
+    """
+    Check if the sequence has already been run
+    """
+    session = None
+    try:
+        session = create_session()
+        protein_result = session.query(ProteinResults).filter(ProteinResults.run_id == run_id).filter(ProteinResults.query_id == identifier).first()
+        return protein_result.status == SUCCESS
+    except Exception as e:
+        print("Error while updating database: ", e)
+        return False
 
 def run_s4pred(input_file, out_file):
     """
@@ -15,7 +28,7 @@ def run_s4pred(input_file, out_file):
     """
     cmd = [PYTHON3_PATH, S4PRED_PATH + '/run_model.py',
            '-t', 'horiz', '-T', '1', input_file]
-    print(f'STEP 1: RUNNING S4PRED: {" ".join(cmd)}')
+    logger.info(f'STEP 1: RUNNING S4PRED: {" ".join(cmd)}')
     p = Popen(cmd, stdin=PIPE,stdout=PIPE, stderr=PIPE)
     try:
       out, err = p.communicate()
@@ -23,12 +36,12 @@ def run_s4pred(input_file, out_file):
       if err:
         raise Exception(err)
       
-      print(out.decode("utf-8"))
+     
       with open(out_file, "w") as fh_out:
         fh_out.write(out.decode("utf-8"))
     
     except Exception as err:
-      print("Error running s4pred")
+      logger.error("Error running s4pred")
       print(err)
       sys.exit(1)
 
@@ -39,7 +52,7 @@ def read_horiz(tmp_file, horiz_file, a3m_file):
     """
     pred = ''
     conf = ''
-    print("STEP 2: REWRITING INPUT FILE TO A3M")
+    logger.info("STEP 2: REWRITING INPUT FILE TO A3M")
     with open(horiz_file) as fh_in:
         for line in fh_in:
             if line.startswith('Conf: '):
@@ -57,12 +70,13 @@ def run_hhsearch(a3m_file):
     """
     Run HHSearch to produce the hhr file
     """
-    
+    NUM_THREADS = 2
+    logger.info(f'NUM_THREADS for HH-SUITE: {str(NUM_THREADS)}')
     cmd = [HH_SUITE__BIN_PATH + '/hhsearch',
-           '-i', a3m_file, '-cpu', '1', '-d', 
+           '-i', a3m_file, '-cpu', str(NUM_THREADS), '-d', 
            PDB70_PATH]
     
-    print(f'STEP 3: RUNNING HHSEARCH: {" ".join(cmd)}')
+    logger.info(f'STEP 3: RUNNING HHSEARCH: {" ".join(cmd)}')
     
     p = Popen(cmd, stdin=PIPE,stdout=PIPE, stderr=PIPE)
     out, err = p.communicate()
@@ -73,9 +87,9 @@ def run_parser(hhr_file, output_file):
     Run the worker_results_parser.py over the hhr file to produce the output summary
     """
 
-    print(f'STEP 4: RUNNING PARSER: {hhr_file}')
+    logger.info(f'STEP 4: RUNNING PARSER: {hhr_file}')
     run_hhr_parser(hhr_file, output_file)
-    print(f"STEP 4: OUTPUT FILE: {output_file}")
+    logger.info(f"STEP 4: OUTPUT FILE: {output_file}")
 
 
 def update_sequence_database(output_file, run_id, identifier):
@@ -129,7 +143,7 @@ def update_db_status(run_id, identifier, status):
         session.add(protein_result)
         session.commit()
         session.close()
-        print(f"Updated status of {identifier} to {status}")
+        logger.info(f"Updated status of {identifier} to {status}")
     except Exception as e:
         print("Error while updating database: ", e)
 
