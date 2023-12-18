@@ -71,7 +71,7 @@ def run_hhsearch(a3m_file):
     """
     Run HHSearch to produce the hhr file
     """
-    NUM_THREADS = 2
+    NUM_THREADS = 1
     logger.info(f'NUM_THREADS for HH-SUITE: {str(NUM_THREADS)}')
     cmd = [HH_SUITE__BIN_PATH + '/hhsearch',
            '-i', a3m_file, '-cpu', str(NUM_THREADS), '-d', 

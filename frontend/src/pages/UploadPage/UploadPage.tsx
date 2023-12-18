@@ -30,7 +30,6 @@ export default function UploadPage() {
       .upload(formData)
       .then((res) => {
         setUploadedStatus(res.data);
-        console.log(res.data);
       })
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));

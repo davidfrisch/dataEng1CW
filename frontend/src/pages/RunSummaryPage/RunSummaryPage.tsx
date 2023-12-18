@@ -20,13 +20,16 @@ export default function RunSummaryPage() {
   const [runResults, setRunResults] = useState([]);
   const [runSummary, setRunSummary] = useState<run_summary | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [hasClickedRetry, setHasClickedRetry] = useState<boolean>(false);
 
   const getRunResults = async (id: string) => {
     try {
       const response = await api.runs.getRun(id);
-      console.log(response);
       const json = await response.data;
       const { proteins, run_summary, progress } = json;
+      if(run_summary.status !== "FAILED" && hasClickedRetry){
+        setHasClickedRetry(false);
+      }
       setRunSummary({ ...run_summary, progress });
       setRunResults(proteins);
     } catch (err: any) {
@@ -54,12 +57,23 @@ export default function RunSummaryPage() {
 
   const retryRun = async (runId: string) => {
     api.runs.retryRun(runId);
+    setHasClickedRetry(true);
   };
 
   useEffect(() => {
     if (!runId) return;
 
     getRunResults(runId);
+  }, [runId]);
+
+  useEffect(() => {
+    if (!runId) return;
+
+    const interval = setInterval(() => {
+      getRunResults(runId);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [runId]);
 
   return (
@@ -91,6 +105,7 @@ export default function RunSummaryPage() {
               hidden={runSummary.status !== "FAILED"}
               onClick={() => retryRun(runSummary.run_id)}
               className="btn"
+              disabled={hasClickedRetry}
             >
               Retry Run
             </button>
