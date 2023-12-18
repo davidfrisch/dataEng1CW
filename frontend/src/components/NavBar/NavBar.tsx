@@ -16,7 +16,7 @@ export default function NavBar({}: Props) {
   }
 
   function goToMetrics() {
-    window.open(SPARK_URL, "_blank");
+    window.open(SPARK_URL+"/", "_blank");
   }
 
   function goToSearch() {
@@ -56,19 +56,28 @@ export default function NavBar({}: Props) {
         </button>
       </div>
       <div className="navbar-status">
-        {statusServices && Object.keys(statusServices).length > 0 &&
+        {statusServices &&
+          Object.keys(statusServices).length > 0 &&
           Object.keys(statusServices).map((key) => {
             return (
               <div className="navbar-status-item" key={key}>
                 <div className="navbar-status-item-name">{key}</div>
                 <div
-                  className={`navbar-status-item-status ${statusServices[key].status?.toLowerCase() === "alive" ? "alive" : "dead"}`}
+                  className={`navbar-status-item-status ${
+                    statusServices[key].status?.toLowerCase() === "alive"
+                      ? "alive"
+                      : "dead"
+                  }`}
                 >
                   {statusServices[key].status || "OFFLINE"}
                 </div>
               </div>
             );
           })}
+        <div className="navbar-status-item">
+          <div className="navbar-status-item-name">Workers</div>
+          <div className="navbar-status-item-status">{statusServices?.spark?.aliveworkers}</div>
+        </div>
       </div>
     </div>
   );

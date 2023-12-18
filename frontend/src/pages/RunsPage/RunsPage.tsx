@@ -3,6 +3,26 @@ import api from "../../api";
 import "./styles.css";
 
 
+const sortRuns = (runs: any) => {
+  // order runs by first RUNNING, then FAILED, then SUCCESS
+  const orderedRuns = runs.sort((a: any, b: any) => {
+    if (a.status === "RUNNING") {
+      return -1;
+    } else if (b.status === "RUNNING") {
+      return 1;
+    } else if (a.status === "FAILED") {
+      return -1;
+    } else if (b.status === "FAILED") {
+      return 1;
+    } else {
+      return 0;
+    }
+  })
+
+  return orderedRuns;
+}
+
+
 export default function RunsPage() {
   const [runResults, setRunResults] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
@@ -10,7 +30,11 @@ export default function RunsPage() {
   const getRunResults = async () => {
     try {
       const response = await api.runs.getRuns();
-      setRunResults(response.data);
+
+      // order runs by first RUNNING, then FAILED, then SUCCESS
+      const orderedRuns = sortRuns(response.data);
+
+      setRunResults(orderedRuns);
     } catch (err: any) {
       console.error(err.message);
     } finally {
@@ -39,7 +63,7 @@ export default function RunsPage() {
             <tr>
               <th>Run ID</th>
               <th>Author</th>
-              <th>Finished</th>
+              <th>Created</th>
               <th>Duration</th>
             </tr>
           </thead>
