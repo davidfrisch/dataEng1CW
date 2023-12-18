@@ -23,12 +23,15 @@ type StartRunData = {
 const startRun = (data: StartRunData) =>
   api.post("/runs/launch_pipeline", data);
 
+const retryRun = (id: string) => api.post(`/runs/${id}/retry`);
+
 const downloadRun = (id: string) => api.get(`/runs/${id}/download`, { responseType: 'blob' });
 
 const runs = {
   getRuns,
   getRun,
   startRun,
+  retryRun,
   downloadRun,
 };
 

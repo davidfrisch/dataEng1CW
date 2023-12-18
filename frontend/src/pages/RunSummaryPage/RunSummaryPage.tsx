@@ -52,15 +52,15 @@ export default function RunSummaryPage() {
     }
   };
 
+  const retryRun = async () => {
+    api.runs.retryRun(runId);
+  };
+
   useEffect(() => {
     if (!runId) return;
 
     getRunResults(runId);
   }, [runId]);
-
-  useEffect(() => {
-    console.log(runResults);
-  }, [runResults]);
 
   return (
     <div>
@@ -68,12 +68,11 @@ export default function RunSummaryPage() {
       {runSummary && (
         <div className="run-summary">
           <div className="run-summary-header">
-            <h2>Run Summary</h2>
+            <h2>Run Summary - {runSummary?.status}</h2>
             {runSummary.status === "RUNNING" && (
               <Timer startDateTime={runSummary.date_started} />
             )}
-            {runSummary.status === "FAILED" ||
-            runSummary.status === "SUCCESS" && (
+            {runSummary.status === "SUCCESS" && (
               <div className="run-rummary-total-time">
                 {Math.floor(runSummary.duration / 60) +
                   "m " +
@@ -87,6 +86,13 @@ export default function RunSummaryPage() {
               className="btn btn-primary"
             >
               Download
+            </button>
+            <button
+              hidden={runSummary.status !== "FAILED"}
+              onClick={retryRun}
+              className="btn"
+            >
+              Retry Run
             </button>
           </div>
           <div>
