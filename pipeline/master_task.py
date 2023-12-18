@@ -79,6 +79,7 @@ def get_avg_score_std(run_id):
         ).filter(ProteinResults.run_id == run_id).scalar()
 
         avg_score_std = score_std_sum/score_std_count
+        session.close()
         return avg_score_std
 
     except Exception as e:
@@ -104,6 +105,7 @@ def get_avg_score_gmean(run_id):
         ).filter(ProteinResults.run_id == run_id).scalar()
 
         avg_score_gmean = score_gmean_sum/score_gmean_count
+        session.close()
         return avg_score_gmean
 
     except Exception as e:

@@ -1,7 +1,6 @@
 import RunsService from "../services/runs.js";
 import { status } from "@prisma/client";
 
-
 export const RunsController = {
   getRuns: async (req, res) => {
     const runs = await RunsService.getRuns();
@@ -11,11 +10,20 @@ export const RunsController = {
   getRun: async (req, res) => {
     const proteins = await RunsService.getProteins(req.params.run_id);
     const run_summary = await RunsService.getRunSummary(req.params.run_id);
-    const progress = proteins.reduce((acc, protein) => {
-      acc.total += 1;
-      acc[protein.status] += 1;
-      return acc;
-    }, { total: 0, [status.PENDING]: 0, [status.RUNNING]: 0, [status.SUCCESS]: 0, [status.FAILED]: 0 });
+    const progress = proteins.reduce(
+      (acc, protein) => {
+        acc.total += 1;
+        acc[protein.status] += 1;
+        return acc;
+      },
+      {
+        total: 0,
+        [status.PENDING]: 0,
+        [status.RUNNING]: 0,
+        [status.SUCCESS]: 0,
+        [status.FAILED]: 0,
+      }
+    );
 
     res.send({ proteins, run_summary, progress });
   },
@@ -44,6 +52,29 @@ export const RunsController = {
     }
   },
 
+  retry: async (req, res) => {
+    const run_id = req.params.run_id;
+
+    if (!run_id) {
+      res.status(400).send({ error: "No run id provided" });
+      return;
+    }
+
+    try {
+      const run_summry = await RunsService.getRunSummary(run_id);
+      if (run_summry.status !== status.FAILED) {
+        res.status(400).send({ error: "Can only retry failed runs" });
+        return;
+      }
+
+      const run_status = await RunsService.retryRun(run_id);
+      res.send({ run_status });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ error });
+    }
+  },
+
   downloadRun: async (req, res) => {
     const run_id = req.params.run_id;
     const zipFile = await RunsService.getZipFile(run_id);
@@ -53,10 +84,13 @@ export const RunsController = {
       console.log("No zip file, returning csv in zip");
       const proteins = await RunsService.getProteins(run_id);
       const csvZIP = await RunsService.toCSVZip(proteins, run_id);
-      res.setHeader(`Content-disposition`, `attachment; filename=${run_id}.zip`);
+      res.setHeader(
+        `Content-disposition`,
+        `attachment; filename=${run_id}.zip`
+      );
       res.set("Content-Type", "application/zip");
       res.status(200).send(csvZIP);
-      return
+      return;
     }
 
     res.setHeader(`Content-disposition`, `attachment; filename=${run_id}.zip`);

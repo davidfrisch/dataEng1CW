@@ -80,6 +80,11 @@ export default {
     return res.data.run_id;
   },
 
+  retryRun: async (run_id) => {
+    const res = await flaskClient.post(`/retry/${run_id}`);
+    return res.data.run_status;
+  }, 
+
   getRunSummary: async (run_id) => {
     const results = await prisma.pipeline_run_summary.findUnique({
       where: {

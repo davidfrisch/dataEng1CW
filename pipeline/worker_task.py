@@ -17,6 +17,7 @@ def check_if_already_ran(identifier, run_id):
     try:
         session = create_session()
         protein_result = session.query(ProteinResults).filter(ProteinResults.run_id == run_id).filter(ProteinResults.query_id == identifier).first()
+        session.close()
         return protein_result.status == SUCCESS
     except Exception as e:
         print("Error while updating database: ", e)

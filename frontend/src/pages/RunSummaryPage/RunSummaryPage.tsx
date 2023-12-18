@@ -52,7 +52,7 @@ export default function RunSummaryPage() {
     }
   };
 
-  const retryRun = async () => {
+  const retryRun = async (runId: string) => {
     api.runs.retryRun(runId);
   };
 
@@ -89,7 +89,7 @@ export default function RunSummaryPage() {
             </button>
             <button
               hidden={runSummary.status !== "FAILED"}
-              onClick={retryRun}
+              onClick={() => retryRun(runSummary.run_id)}
               className="btn"
             >
               Retry Run

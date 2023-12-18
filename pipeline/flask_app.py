@@ -68,9 +68,18 @@ def launch_pipeline():
     cmd = f'python3 pipeline_script.py -f {local_path} --master {SPARK_MASTER_URL} --run_id {run_id}'
     print(cmd)
     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
-    # run in the background
+
     return {'run_id': run_id, 'spark_master_url': SPARK_MASTER_URL, 'file_path': local_path}
     
-    
+
+@app.route('/retry/<run_id>', methods=['POST'])
+def retry_pipeline(run_id: str):
+    cmd = f'python3 pipeline_script.py --master {SPARK_MASTER_URL} --run_id {run_id}'
+    print(cmd)
+    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+
+    return {'run_id': run_id, 'spark_master_url': SPARK_MASTER_URL}
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -19,7 +19,7 @@ def argparser():
         description='runs the data analysis pipeline to predict protein structure',
         epilog='Example: python pipeline_script_pyspark.py -f <input_file> [options]' )
     
-    parser.add_argument('-f', '--input_file', help='Input file to run the pipeline on, must be in fasta format', required=True)
+    parser.add_argument('-f', '--input_file', help='Input file to run the pipeline on, must be in fasta format')
     parser.add_argument('--local', help='Run the pipeline locally', action='store_true', default=False)
     parser.add_argument('-m', '--master', help='Spark master url', default=master_url)
     parser.add_argument('--run_id', help='Unique run id', default=run_id)

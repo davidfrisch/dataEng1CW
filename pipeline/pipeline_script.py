@@ -14,6 +14,7 @@ import zipfile
 from pipeline.database import create_session
 from pipeline.models.protein_results import ProteinResults, PENDING
 from pipeline.models.pipeline_run_summary import PipelineRunSummary, SUCCESS, RUNNING, FAILED
+from pipeline.models.proteome import Proteomes
 from pipeline.logger import logger
 
 def zip_module():
@@ -107,6 +108,7 @@ if __name__ == "__main__":
     spark = None
     master_url = None
     run_id = None
+
     args = argparser()
     if args.master:
         master_url = args.master
@@ -137,13 +139,11 @@ if __name__ == "__main__":
     logger.info(f"START RUN ID: {run_id}")
     start_time = time.time()
 
-    sequences = read_input(args.input_file)
-    sequence_list = list(sequences.items())
     whoami = os.getenv('USER')
     session = create_session()
 
     pipeline_already_exists = session.query(PipelineRunSummary).filter(PipelineRunSummary.run_id == run_id).first()
-
+    sequence_list = []
     if pipeline_already_exists is None:
         new_pipeline_run_summary = PipelineRunSummary(
             run_id=run_id,
@@ -153,6 +153,9 @@ if __name__ == "__main__":
         )
         session.add(new_pipeline_run_summary)
         session.commit()
+
+        sequences = read_input(args.input_file)
+        sequence_list = list(sequences.items())
 
         for sequence in sequence_list:
             id = sequence[0]
@@ -175,10 +178,17 @@ if __name__ == "__main__":
         update_pipeline_run_summary = session.query(PipelineRunSummary).filter(PipelineRunSummary.run_id == run_id).first()
         update_pipeline_run_summary.status = RUNNING
         session.add(update_pipeline_run_summary)
+        # take all the proteomes that are in the run
+        all_proteins_of_run = session.query(ProteinResults).filter(ProteinResults.run_id == run_id).all()
+        all_proteins_ids = [protein.query_id for protein in all_proteins_of_run]
+        all_proteins_data = session.query(Proteomes).filter(Proteomes.id.in_(all_proteins_ids)).all()
+        sequence_list = [[protein.id, protein.sequence] for protein in all_proteins_data]
+
         
 
     session.commit()
     session.close()
+
 
     parallelised_data = spark.sparkContext.parallelize(sequence_list, numSlices=num_workers)
     parallelised_data.foreach(lambda x: process_sequence(x[0], x[1], run_id,  sequence_list.index(x)))
