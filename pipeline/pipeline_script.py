@@ -178,8 +178,8 @@ if __name__ == "__main__":
         update_pipeline_run_summary = session.query(PipelineRunSummary).filter(PipelineRunSummary.run_id == run_id).first()
         update_pipeline_run_summary.status = RUNNING
         session.add(update_pipeline_run_summary)
-        # take all the proteomes that are in the run
-        all_proteins_of_run = session.query(ProteinResults).filter(ProteinResults.run_id == run_id).all()
+        # take all the proteomes that are not success and run them again
+        all_proteins_of_run = session.query(ProteinResults).filter(ProteinResults.run_id == run_id).filter(ProteinResults.status != SUCCESS).all()
         all_proteins_ids = [protein.query_id for protein in all_proteins_of_run]
         all_proteins_data = session.query(Proteomes).filter(Proteomes.id.in_(all_proteins_ids)).all()
         sequence_list = [[protein.id, protein.sequence] for protein in all_proteins_data]

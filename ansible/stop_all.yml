@@ -9,11 +9,15 @@
     - name: Docker compose down
       shell:  cd {{ repo_dir }} && docker compose down
 
-    - name: Clean cache
-      become: true
-      shell: sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches
-  
     - name: Stop flask app
       shell: "pkill -f 'gunicorn -b 0.0.0.0:5000 flask_app:app'"
       async: 0
       poll: 0
+
+- name: Clean up Cache
+  hosts: client, cluster
+
+  tasks:
+    - name: Clean cache
+      become: true
+      shell: sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches
