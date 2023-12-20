@@ -23,7 +23,8 @@ export default {
       for (const run of runsRunning) {
         if (
           !activeAppsName.includes(run.run_id) &&
-          !completedAppsName.includes(run.run_id)
+          (!completedAppsName.includes(run.run_id) ||
+            run.state === "KILLED")
         ) {
           await prisma.pipeline_run_summary.update({
             where: {
