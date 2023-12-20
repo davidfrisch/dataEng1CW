@@ -54,13 +54,14 @@ def read_input(file):
 
 
 def process_sequence(identifier, sequence, run_id, index):
-    logger.info(f"PROCESSING SEQUENCE {index} with id {identifier}")
-    tmp_file = f"{ROOT_DIR}/tmp/{run_id}/{index}.fas"
-    horiz_file = f"{ROOT_DIR}/tmp/{run_id}/horiz/{index}.horiz"
-    a3m_file = f"{ROOT_DIR}/tmp/{run_id}/a3m/{index}.a3m"
-    hhr_file = f"{ROOT_DIR}/tmp/{run_id}/a3m/{index}.hhr"
-    object_name = f"{run_id}/{index}.out"
-    output_file = f"{ROOT_DIR}/data/output/{run_id}/{index}.out"
+    identifier_short = identifier.split("|")[1]
+    logger.info(f"PROCESSING SEQUENCE {index} with id {identifier} and identifier_short {identifier_short}")
+    tmp_file = f"{ROOT_DIR}/tmp/{run_id}/{identifier_short}.fas"
+    horiz_file = f"{ROOT_DIR}/tmp/{run_id}/horiz/{identifier_short}.horiz"
+    a3m_file = f"{ROOT_DIR}/tmp/{run_id}/a3m/{identifier_short}.a3m"
+    hhr_file = f"{ROOT_DIR}/tmp/{run_id}/a3m/{identifier_short}.hhr"
+    object_name = f"{run_id}/{identifier_short}.out"
+    output_file = f"{ROOT_DIR}/data/output/{run_id}/{identifier_short}.out"
 
     # Early exit if the folders are not set up correctly
     if not os.path.exists(HH_SUITE__BIN_PATH):

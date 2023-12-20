@@ -11,8 +11,6 @@ export default {
       const flaskStauts = await HealthService.getHealthFlask();
       const { spark } = flaskStauts;
       const { activeapps, completedapps } = spark;
-      const activeAppsName = activeapps.map((app) => app.name);
-      const completedAppsName = completedapps.map((app) => app.name);
 
       const runsRunning = await prisma.pipeline_run_summary.findMany({
         where: {
@@ -21,10 +19,12 @@ export default {
       });
 
       for (const run of runsRunning) {
+        const runData = activeapps.find((app) => app.name === run.run_id) || completedapps.find((app) => app.name === run.run_id);
+
         if (
-          !activeAppsName.includes(run.run_id) &&
-          (!completedAppsName.includes(run.run_id) ||
-            run.state === "KILLED")
+          !activeapps.map((app) => app.name).includes(run.run_id) &&
+          (!completedapps.map((app) => app.name).includes(run.run_id) || 
+          (runData !== "undefined" && runData?.state === "KILLED"))
         ) {
           await prisma.pipeline_run_summary.update({
             where: {
