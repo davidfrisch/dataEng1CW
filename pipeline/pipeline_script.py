@@ -4,10 +4,11 @@ import sys
 import time
 from datetime import datetime
 from pyspark.sql import SparkSession
+from pyspark import SparkConf
 from Bio import SeqIO
 from pipeline_argparser import argparser
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from pipeline.constants import HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR
+from pipeline.constants import HH_SUITE__BIN_PATH, PDB70_PATH, S4PRED_PATH, ROOT_DIR, SPARK_EXECUTOR_MEMORY, SPARK_DRIVER_MEMORY
 from pipeline.worker_task import check_if_already_ran, run_s4pred, read_horiz, run_hhsearch, run_parser, update_sequence_database, update_db_status, clean_up_tmp_files
 from pipeline.master_task import merge_results, write_best_hits, write_profile_csv, save_results_to_db, get_avg_score_gmean, get_avg_score_std, zip_results
 import zipfile
@@ -109,6 +110,7 @@ if __name__ == "__main__":
     spark = None
     master_url = None
     run_id = None
+    ids = None
 
     args = argparser()
     if args.master:
@@ -129,8 +131,13 @@ if __name__ == "__main__":
     if master_url == "local[*]":
         num_workers = 1
     
-    
-    spark = SparkSession.builder.appName(run_id).master(master_url).getOrCreate()
+    sparkConf = SparkConf()
+
+    sparkConf.set("spark.executor.memory", SPARK_EXECUTOR_MEMORY)
+    sparkConf.set("spark.driver.memory", SPARK_DRIVER_MEMORY)
+    sparkConf.set("spark.testing.memory", "2147480000")
+
+    spark = SparkSession.builder.appName(run_id).config(conf=sparkConf).master(master_url).getOrCreate()
     path_to_pipeline_zip = zip_module()
     spark.sparkContext.addPyFile(path_to_pipeline_zip)
     
@@ -155,8 +162,17 @@ if __name__ == "__main__":
         session.add(new_pipeline_run_summary)
         session.commit()
 
-        sequences = read_input(args.input_file)
-        sequence_list = list(sequences.items())
+        if args.ids:
+            logger.info(f"running on ids")
+            ids = [line.rstrip('\n') for line in open(args.ids)]
+            all_proteins_data = session.query(Proteomes).filter(Proteomes.id.in_(ids)).all()
+            sequence_list = [[protein.id, protein.sequence] for protein in all_proteins_data]
+        elif args.input_file:
+            sequences = read_input(args.input_file)
+            sequence_list = list(sequences.items())
+        else:
+            logger.error("Please provide an input file with -f or a list of ids with -i")
+            sys.exit(1)
 
         for sequence in sequence_list:
             id = sequence[0]

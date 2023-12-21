@@ -8,6 +8,8 @@ load_dotenv(f"/mnt/data/dataEng1CW/.env")
 load_dotenv(f"{ROOT_DIR}/.env")
 
 NUM_WORKERS_DEFAULT = 5
+SPARK_EXECUTOR_MEMORY="500m"
+SPARK_DRIVER_MEMORY="1g"
 PYTHON3_PATH = os.getenv('PYTHON3_PATH')
 HH_SUITE__BIN_PATH = os.getenv('HH_SUITE__BIN_PATH')
 PDB70_PATH = os.getenv('PDB70_PATH')
