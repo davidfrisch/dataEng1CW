@@ -57,7 +57,10 @@ const proteins = {
     }, [] as string[]);
     return { missingIds, foundIds };
   },
+
 };
+
+
 
 const health = () => api.get("/health");
 

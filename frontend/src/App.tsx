@@ -4,7 +4,7 @@ import RunsPage from "./pages/RunsPage/RunsPage";
 import RunSummaryPage from "./pages/RunSummaryPage/RunSummaryPage";
 import NavBar from "./components/NavBar/NavBar";
 import UploadPage from "./pages/UploadPage/UploadPage";
-import SearchPage from "./pages/SearchPage";
+import SearchPage from "./pages/SearchPage/SearchPage";
 import NewRunPage from "./pages/NewRunPage/NewRunPage";
 
 function App() {
