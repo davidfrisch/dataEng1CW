@@ -27,13 +27,17 @@ export default function NavBar({}: Props) {
     window.location.href = "/new-run";
   }
 
+  // Update status every 10 seconds
   useEffect(() => {
-    api
-      .health()
-      .then((res) => {
-        setStatusServices(res.data);
-      })
-      .catch((err) => console.log(err));
+    const interval = setInterval(() => {
+      api
+        .health()
+        .then((res) => {
+          setStatusServices(res.data);
+        })
+        .catch((err) => console.log(err));
+    }, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

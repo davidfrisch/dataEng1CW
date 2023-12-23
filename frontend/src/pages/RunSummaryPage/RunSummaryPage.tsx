@@ -82,7 +82,7 @@ export default function RunSummaryPage() {
       {runSummary && (
         <div className="run-summary">
           <div className="run-summary-header">
-            <h2>Run Summary - {runSummary?.status}</h2>
+            <h2>{runSummary.run_id} - {runSummary?.status}</h2>
             {runSummary.status === "RUNNING" && (
               <Timer startDateTime={runSummary.date_started} />
             )}

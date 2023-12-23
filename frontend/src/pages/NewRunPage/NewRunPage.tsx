@@ -39,7 +39,7 @@ export default function NewRunPage() {
 
   const handleStartRun = async () => {
     const ids = idsStatus.foundIds;
-    const res = await api.runs.startRun({ ids, process_name: nameOfRun });
+    const res = await api.runs.startRun({ ids, process_name: nameOfRun.trim() });
     console.log(res);
     if (res.status === 200) {
       setIsRunStarted(true);
@@ -75,7 +75,7 @@ export default function NewRunPage() {
       {idsStatus?.foundIds?.length > 0 && !isRunStarted && (
         <div>
           <div>
-            <h2>Start a run ? </h2>
+            <h2>Start a run ? (Name without spaces) </h2>
 
             {idsStatus?.missingIds.length > 0 && (
               <div>All missing ids will not be included in the run</div>

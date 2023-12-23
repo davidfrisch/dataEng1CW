@@ -13,7 +13,7 @@ export default function StartRunForm({ fasta_file_path }: Props) {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const res = await api.runs.startRun({
-      process_name: name,
+      process_name: name.trim(),
       fasta_file_path: fasta_file_path,
     });
     setStatus(res.data);
@@ -30,7 +30,7 @@ export default function StartRunForm({ fasta_file_path }: Props) {
 
   return (
     <div>
-      <h2>Start a new run</h2>
+      <h2>Start a new run  (Name without spaces)</h2>
       <form onSubmit={handleSubmit}>
         <label htmlFor="process_name">Name of the run:</label>
         <input
