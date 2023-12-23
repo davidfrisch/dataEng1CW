@@ -8,6 +8,24 @@ export default {
       },
     });
 
+    
+
+    return proteins;
+  },
+
+  searchProtein: async (id) => {
+    const proteins = await prisma.proteomes.findMany({
+      where: {
+        id: {
+          contains: id,
+          mode: "insensitive",
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
     return proteins;
   },
 

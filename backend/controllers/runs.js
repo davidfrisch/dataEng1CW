@@ -34,6 +34,14 @@ export const RunsController = {
       const fasta_file_path = req.body?.fasta_file_path;
       const ids = req.body?.ids;
 
+      try {
+        await RunsService.checkProcessName(process_name);
+      } catch (error) {
+        res.status(400).send({ error });
+        return;
+      }
+      
+
       if (ids?.length > 0) {
         const run_id = await RunsService.startRunIds(ids, process_name);
         res.send({ run_id });

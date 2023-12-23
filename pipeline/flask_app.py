@@ -24,6 +24,12 @@ def hello_world():
             <div>
               POST to /launch_pipeline with file_path as path of the file to process
             </div>
+            <div>
+              POST to /retry/<run_id> to retry a failed pipeline
+            </div>
+            <div>
+              GET /health to check the health of the application
+            </div>
         </body>
     </html>
     """
@@ -48,6 +54,7 @@ def launch_pipeline():
     name = data['name'] if 'name' in data else None
     local_path = f'{ROOT_DIR}/data/{filename}'
     run_id = name + '_' + str(int(time()))
+    os.makedirs(f'{ROOT_DIR}/data/fasta_file/{run_id}',  exist_ok=True)
 
     if ids and not filename:
         local_path = f'{ROOT_DIR}/data/{run_id}.fasta'

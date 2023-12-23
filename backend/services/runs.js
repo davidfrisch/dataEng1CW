@@ -50,6 +50,18 @@ export default {
     return runs;
   },
 
+  checkProcessName: async (processName) => {
+    if(!processName) {
+      throw "No process name provided";
+    }
+
+    if(processName.trim().includes(" ")) {
+      throw "Process name cannot contain spaces";
+    }
+
+    return true;
+  },
+
   getProteins: async (run_id) => {
     const results = prisma.protein_results.findMany({
       where: {
@@ -64,6 +76,10 @@ export default {
   },
 
   startRunIds: async (ids, processName) => {
+
+    
+
+
     const res = await flaskClient.post("/launch_pipeline", {
       ids: ids,
       name: processName,
