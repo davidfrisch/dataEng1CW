@@ -16,7 +16,7 @@ export default function NavBar({}: Props) {
   }
 
   function goToMetrics() {
-    window.open(SPARK_URL+"/", "_blank");
+    window.open(SPARK_URL + "/", "_blank");
   }
 
   function goToSearch() {
@@ -28,6 +28,18 @@ export default function NavBar({}: Props) {
   }
 
   // Update status every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      api
+        .health()
+        .then((res) => {
+          setStatusServices(res.data);
+        })
+        .catch((err) => console.log(err));
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const interval = setInterval(() => {
       api
@@ -80,7 +92,9 @@ export default function NavBar({}: Props) {
           })}
         <div className="navbar-status-item">
           <div className="navbar-status-item-name">Workers</div>
-          <div className="navbar-status-item-status">{statusServices?.spark?.aliveworkers}</div>
+          <div className="navbar-status-item-status">
+            {statusServices?.spark?.aliveworkers}
+          </div>
         </div>
       </div>
     </div>
