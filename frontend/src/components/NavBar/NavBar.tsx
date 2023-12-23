@@ -27,7 +27,6 @@ export default function NavBar({}: Props) {
     window.location.href = "/new-run";
   }
 
-  // Update status every 10 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       api
@@ -41,15 +40,12 @@ export default function NavBar({}: Props) {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      api
-        .health()
-        .then((res) => {
-          setStatusServices(res.data);
-        })
-        .catch((err) => console.log(err));
-    }, 10000);
-    return () => clearInterval(interval);
+    api
+      .health()
+      .then((res) => {
+        setStatusServices(res.data);
+      })
+      .catch((err) => console.log(err));
   }, []);
 
   return (
