@@ -19,12 +19,14 @@ export default {
       });
 
       for (const run of runsRunning) {
-        const runData = activeapps.find((app) => app.name === run.run_id) || completedapps.find((app) => app.name === run.run_id);
+        const runData =
+          activeapps.find((app) => app.name === run.run_id) ||
+          completedapps.find((app) => app.name === run.run_id);
 
         if (
           !activeapps.map((app) => app.name).includes(run.run_id) &&
-          (!completedapps.map((app) => app.name).includes(run.run_id) || 
-          (runData !== "undefined" && runData?.state === "KILLED"))
+          (!completedapps.map((app) => app.name).includes(run.run_id) ||
+            (runData !== "undefined" && runData?.state === "KILLED"))
         ) {
           await prisma.pipeline_run_summary.update({
             where: {
@@ -32,6 +34,17 @@ export default {
             },
             data: {
               status: "FAILED",
+            },
+          });
+        }
+
+        if (runData?.state === "FINISHED" && run.status !== "SUCCESS") {
+          await prisma.pipeline_run_summary.update({
+            where: {
+              run_id: run.run_id,
+            },
+            data: {
+              status: "SUCCESS",
             },
           });
         }
@@ -51,11 +64,11 @@ export default {
   },
 
   checkProcessName: async (processName) => {
-    if(!processName) {
+    if (!processName) {
       throw "No process name provided";
     }
 
-    if(processName.trim().includes(" ")) {
+    if (processName.trim().includes(" ")) {
       throw "Process name cannot contain spaces";
     }
 
@@ -76,10 +89,6 @@ export default {
   },
 
   startRunIds: async (ids, processName) => {
-
-    
-
-
     const res = await flaskClient.post("/launch_pipeline", {
       ids: ids,
       name: processName,
@@ -100,7 +109,7 @@ export default {
   retryRun: async (run_id) => {
     const res = await flaskClient.post(`/retry/${run_id}`);
     return res.data.run_status;
-  }, 
+  },
 
   getRunSummary: async (run_id) => {
     const results = await prisma.pipeline_run_summary.findUnique({

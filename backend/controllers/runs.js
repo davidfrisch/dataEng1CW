@@ -70,8 +70,8 @@ export const RunsController = {
 
     try {
       const run_summry = await RunsService.getRunSummary(run_id);
-      if (run_summry.status !== status.FAILED) {
-        res.status(400).send({ error: "Can only retry failed runs" });
+      if (run_summry.status === status.RUNNING) {
+        res.status(400).send({ error: "Run is already running" });
         return;
       }
 

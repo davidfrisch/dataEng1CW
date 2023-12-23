@@ -102,7 +102,7 @@ export default function RunSummaryPage() {
               Download
             </button>
             <button
-              hidden={runSummary.status !== "FAILED"}
+              hidden={runSummary.status === "RUNNING"}
               onClick={() => retryRun(runSummary.run_id)}
               className="btn"
               disabled={hasClickedRetry}
