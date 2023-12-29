@@ -11,11 +11,13 @@
 
     - name: Stop flask app
       shell: "pkill -f 'gunicorn -b 0.0.0.0:5000 flask_app:app'"
+      # Ignore error because the flask app may not be running
+      ignore_errors: true
       async: 0
       poll: 0
 
 - name: Clean up Cache
-  hosts: client, cluster
+  hosts: client, clusters
 
   tasks:
     - name: Clean cache

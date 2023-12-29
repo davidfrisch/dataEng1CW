@@ -1,0 +1,12 @@
+- name: Check if pdb70 is already downloaded
+  ansible.builtin.stat:
+    path: /mnt/data/pdb70
+  register: pdb70_installation
+
+- name: Download pdb70
+  include_tasks: tasks/download_pdb70.yml
+  when: not pdb70_installation.stat.exists
+
+- name: Send pdb70 to clusters
+  include_tasks: tasks/send_pdb70_to_clusters.yml
+  when: pdb70_installation.stat.exists

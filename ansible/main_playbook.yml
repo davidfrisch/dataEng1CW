@@ -1,5 +1,17 @@
 
+- name: Cluster Playbook
+  hosts: clusters
+  become: true
 
+  tasks:
+    - include_vars: vars.yml
+    - include_vars: custom_vars.yml
+
+    - name: Include common role
+      import_role:
+        name: common
+
+        
 - name: Master Playbook
   hosts: client
   become: true
@@ -15,28 +27,14 @@
     - name: Include master role
       import_role:
         name: master
-
-    - name: Echo spark master that will be used
-      debug:
-        msg: "Spark master is spark://{{ groups['client'][0] }}:7077"
-
-
-- name: Cluster Playbook
-  hosts: clusters
-  become: true
-
-  tasks:
-    - include_vars: vars.yml
-    - include_vars: custom_vars.yml
-
-    - name: Include common role
-      import_role:
-        name: common
     
-    - name: Include cluster role
+    - name: Include pdb70 role
       import_role:
-        name: cluster
+        name: pdb70
 
-    - name: Echo spark master that will be used
-      debug:
-        msg: "Spark master is spark://{{ groups['client'][0] }}:7077"
+
+
+
+
+
+

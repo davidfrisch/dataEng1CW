@@ -1,0 +1,13 @@
+
+- name: ssh test to cluster
+  shell: |
+    ssh -i {{ ssh_private_key }} -o StrictHostKeyChecking=no ec2-user@{{ item }} echo "ssh test to {{ item }} successful"
+  register: ssh_test
+  with_items: "{{ groups['clusters'] }}"
+
+- name: Copy pdb70 from client to clusters
+  become: true
+  shell: |
+    rsync -avzu -e "ssh -i {{ ssh_private_key }} -o StrictHostKeyChecking=no" /mnt/data/pdb70 ec2-user@{{ item }}:/mnt/data/
+  with_items: "{{ groups['clusters'] }}"
+  when: ssh_test is success

@@ -1,14 +1,5 @@
 ---
 
-- name: Check if pdb70 is already downloaded
-  ansible.builtin.stat:
-    path: /mnt/data/pdb70
-  register: pdb70_installation
-
-- name: Download pdb70
-  include_tasks: tasks/download_pdb70.yml
-  when: not pdb70_installation.stat.exists
-
 - name: ssh to workers
   include_tasks: tasks/ssh_to_workers.yml
 
