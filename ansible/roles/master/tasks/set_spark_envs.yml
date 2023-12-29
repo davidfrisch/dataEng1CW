@@ -10,10 +10,6 @@
 - name: Add workers list
   lineinfile:
     dest: "{{ spark_install_dir }}/spark/conf/workers"
-    line: "{{ item }}"
+    line: "ec2-user@{{ item }}"
     state: present
-  with_items:
-    - "ec2-user@{{ groups['clusters'][0] }}"
-    - "ec2-user@{{ groups['clusters'][1] }}"
-    - "ec2-user@{{ groups['clusters'][2] }}"
-    - "ec2-user@{{ groups['clusters'][3] }}"
+  with_items: "{{ groups['clusters'] }}"

@@ -1,6 +1,5 @@
 ---
-# ssh key
-ssh_private_key: ~/.ssh/david_student_key
+
 
 # spark vars
 spark_user: ec2-user

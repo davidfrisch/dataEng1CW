@@ -1,5 +1,6 @@
 
-ssh_private_key: /home/ec2-user/.ssh/david_student_key
+ssh_private_key: /home/ec2-user/.ssh/lecturer_key
+git_token: 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
 spark_user: ec2-user
 spark_group: ec2-user
 

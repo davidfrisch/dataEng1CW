@@ -3,10 +3,12 @@ set -e
 DIRECTORY=$(dirname $0)
 
 SECRET_KEY_FILE=""
+GIT_TOKEN=""
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -s|--secret-key-file) SECRET_KEY_FILE="$2"; shift ;;
+        -t|--git-token) GIT_TOKEN="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
     shift
@@ -14,7 +16,7 @@ done
 
 
 if [[ -z "$SECRET_KEY_FILE" ]]; then
-    echo "ERROR: secret key file not specified!"
+    echo "ERROR: secret key file not specified!, -s|--secret-key-file"
     exit 1
 fi
 
@@ -23,6 +25,10 @@ if [[ ! -f "$SECRET_KEY_FILE" ]]; then
     exit 1
 fi
 
+if [[ -z "$GIT_TOKEN" ]]; then
+    echo "ERROR: git token not specified!, -t|--git-token"
+    exit 1
+fi
 
 
 python3_version=$(python3 -V 2>&1 | grep -Po '(?<=Python )(.+)')
@@ -43,6 +49,7 @@ fi
 
 echo "
 ssh_private_key: $SECRET_KEY_FILE
+git_token: $GIT_TOKEN
 spark_user: ec2-user
 spark_group: ec2-user
 " > $DIRECTORY/../ansible/custom_vars.yml
@@ -52,5 +59,16 @@ spark_group: ec2-user
 python3 -m ensurepip --upgrade
 python3 -m pip install --upgrade pip
 pip3 install ansible
+
+
+sudo chown -R ec2-user:ec2-user /etc/ansible
+echo "[defaults]
+private_key_file = $SECRET_KEY_FILE"> /etc/ansible/ansible.cfg
+
+
+eval "$(ssh-agent -s)"
+chmod 600 $SECRET_KEY_FILE
+ssh-add $SECRET_KEY_FILE
+
 
 echo "Finished installing host dependencies."

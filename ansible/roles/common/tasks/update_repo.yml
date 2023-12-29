@@ -9,11 +9,10 @@
     recurse: yes
 
 - name: Update git repo
-  git:
-    repo: '{{ git_repo }}'
-    dest: "{{ repo_dir }}"
-    accept_hostkey: yes
-    key_file: /home/ec2-user/.ssh/david_student_key
+  shell:  |
+    cd {{ repo_dir }} && \
+    git pull https://{{ git_token }}@github.com/davidfrisch/dataEng1CW
+
 
 - name: Install nslookup with yum
   yum:

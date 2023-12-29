@@ -1,9 +1,9 @@
 ---
 # tasks file for cluster
 
-- name: Check if pdb70 is already downloaded
+- name: Check that pdb70 is already downloaded
   ansible.builtin.stat:
-    path: /mnt/data/pdb70
+    path: /mnt/data/pdb70/pdb70_a3m.ffdata
   register: pdb70_installation
 
 - name: Copy pdb70 from client

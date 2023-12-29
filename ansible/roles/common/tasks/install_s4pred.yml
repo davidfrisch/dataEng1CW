@@ -1,10 +1,8 @@
 ---
 - name: Git clone s4pred
-  ansible.builtin.git:
-    repo: git@github.com:psipred/s4pred.git
-    dest: "{{ s4pred_dir }}"
-    accept_hostkey: yes
-    key_file: /home/ec2-user/.ssh/david_student_key
+  shell: |
+    cd {{ base_s4pred_dir }} && \
+    git clone https://{{ git_token }}@github.com/psipred/s4pred
 
     
 - name: Download the weights

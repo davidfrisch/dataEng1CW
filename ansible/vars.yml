@@ -3,6 +3,7 @@ my_region: eu-west-2
 
 # git vars
 git_repo: git@github.com:davidfrisch/dataEng1CW.git
+base_repo_dir: /mnt/data
 repo_dir: /mnt/data/dataEng1CW
 
 # hh-suite vars
@@ -11,6 +12,7 @@ hh_suite_file: hhsuite-3.3.0-AVX2-Linux.tar.gz
 hh_suite_url: https://github.com/soedinglab/hh-suite/releases/download/v3.3.0/hhsuite-3.3.0-AVX2-Linux.tar.gz
 
 # s4pred vars
+base_s4pred_dir: /mnt/data/programs
 s4pred_dir: /mnt/data/programs/s4pred
 
 # java version

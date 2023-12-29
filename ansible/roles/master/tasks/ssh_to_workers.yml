@@ -2,7 +2,7 @@
 - name: Give private key to master
   copy:
     src: "{{ ssh_private_key }}"
-    dest: "~/.ssh/david_student_key"
+    dest: "{{ ssh_private_key }}"
     owner: "{{ spark_user }}"
     group: "{{ spark_group }}"
     mode: 0600
@@ -10,24 +10,27 @@
 - name: Give public key to master
   copy:
     src: "{{ ssh_private_key }}.pub"
-    dest: "~/.ssh/david_student_key.pub"
+    dest: "{{ ssh_private_key }}.pub"
     owner: "{{ spark_user }}"
     group: "{{ spark_group }}"
     mode: 0600
 
-- name: wake up ssh-agent and add david_student_key
+- name: wake up ssh-agent and add private_key
   shell: |
     eval `ssh-agent -s`
-    ssh-add /home/ec2-user/.ssh/david_student_key
+    ssh-add {{ ssh_private_key }}
 
 
 - name: SSH to workers and say yes to add them to known hosts
   become: true
-  command: ssh -o StrictHostKeyChecking=no -i ~/.ssh/david_student_key {{ item }} "echo 'yes' > /dev/null"
+  command: ssh -o StrictHostKeyChecking=no -i {{ ssh_private_key }} ec2-user@{{ item }} "echo 'yes' > /dev/null"
   with_items:
-    - "ec2-user@{{ groups['clusters'][0] }}"
-    - "ec2-user@{{ groups['clusters'][1] }}"
-    - "ec2-user@{{ groups['clusters'][2] }}"
-    - "ec2-user@{{ groups['clusters'][3] }}"
+    - "{{ groups['clusters'] }}"
+
+
+- name: ssh test to cluster
+  shell: |
+    ssh -i {{ ssh_private_key }} -o StrictHostKeyChecking=no ec2-user@{{ item }} echo "ssh test to {{ item }} successful"
+  with_items: "{{ groups['clusters'] }}"
 
 
