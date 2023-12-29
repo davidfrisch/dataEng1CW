@@ -2,7 +2,7 @@
 
 ## Description
 This is a repository for the coursework of the Data Engineering 1 module.
-The coursework is to predict possible 3D structures of proteins in the Human Genome.
+The coursework is to predict possible 3D structures of proteins in the Human Genome in a distributed fashion.
 
 ## Requirements
 - Have the same public and private ssh key of the Client VM and the Clusters VMs in the `~/.ssh` folder of the host.
