@@ -59,6 +59,8 @@ spark_group: ec2-user
 python3 -m ensurepip --upgrade
 python3 -m pip install --upgrade pip
 pip3 install ansible
+pip3 install python-dotenv
+pip3 install requests
 
 
 sudo chown -R ec2-user:ec2-user /etc/ansible
@@ -70,5 +72,9 @@ eval "$(ssh-agent -s)"
 chmod 600 $SECRET_KEY_FILE
 ssh-add $SECRET_KEY_FILE
 
+# take the next line of [client] from the inventory file
+BACKEND_ADDRESS=$(awk '/\[client\]/{getline; print}' $DIRECTORY/../ansible/inventory.ini | cut -d' ' -f1)
+
+echo "BACKEND_URL=http://$BACKEND_ADDRESS/api" > $DIRECTORY/../python_client/.env
 
 echo "Finished installing host dependencies."

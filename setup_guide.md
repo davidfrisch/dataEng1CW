@@ -20,15 +20,6 @@ Both keys must be located in the `~/.ssh` folder of the host.
 
 Make sure the client VM can SSH to each node.
 
-## Host Setup
-
-Run the following commands to set up the hosts:
-
-```bash
-./scripts/host_setup_script.sh -s <my_private_key> -t <git_token>
-```
-
-This script creates the file `ansible/custom_vars.yml` with your custom variables.
 
 ## Inventory Configuration
 
@@ -47,6 +38,17 @@ echo "\
 "\
 >./ansible/inventory.ini
 ```
+
+## Host Setup
+
+Run the following commands to set up the hosts:
+
+```bash
+sudo yum update -y
+./scripts/host_setup_script.sh -s <my_private_key> -t <git_token>
+```
+
+This script creates the file `ansible/custom_vars.yml` with your custom variables.
 
 ## Dependencies Installation
 
