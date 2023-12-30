@@ -17,10 +17,16 @@ def get_run_status(run_id: str):
         return
 
     print(f'Run summary: {run_summary["run_id"]}')
-    # 'progress': {'total': 5, 'PENDING': 0, 'RUNNING': 0, 'SUCCESS': 5, 'FAILED': 0}}
     print(f"Progress: {progress['total']} total, {progress['PENDING']} pending, {progress['RUNNING']} running, "
           f"{progress['SUCCESS']} success, {progress['FAILED']} failed")
     print(f"{progress['SUCCESS']}/{progress['total']} proteins completed")
+    
+    if progress['PENDING'] == 0:
+        print('You can download the results by running:')
+        print(f'python3 download_run_results.py {run_id}')
+    else:
+        SPARK_URL = client.base_url.replace('api', 'spark-master/')
+        print(f"Spark master url: {SPARK_URL}")
 
 
 if __name__ == '__main__':
