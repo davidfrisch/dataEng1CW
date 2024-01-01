@@ -27,6 +27,8 @@
       async: 0
       poll: 0
     
+    - name: You can now access the app 
+      debug: msg="You can now access the app at http://{{ groups['client'][0] }}"
 
    
     
