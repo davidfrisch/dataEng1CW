@@ -1,7 +1,7 @@
 import React from "react";
 import api from "../../api";
 import "./styles.css";
-
+import { GridLoader } from "react-spinners";
 
 const sortRuns = (runs: any) => {
   // order runs by first RUNNING, then FAILED, then SUCCESS
@@ -17,11 +17,10 @@ const sortRuns = (runs: any) => {
     } else {
       return 0;
     }
-  })
+  });
 
   return orderedRuns;
-}
-
+};
 
 export default function RunsPage() {
   const [runResults, setRunResults] = React.useState([]);
@@ -48,14 +47,12 @@ export default function RunsPage() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <GridLoader color={"#36D7B7"} loading={loading} size={20} />;
   }
 
   return (
     <div className="run-page">
-      <div className="start-run-container">
-
-      </div>
+      <div className="start-run-container"></div>
       <div className="run-results-container">
         <h1>Run Results</h1>
         <table>
@@ -78,7 +75,14 @@ export default function RunsPage() {
                   </td>
                   <td>{runResults.author}</td>
                   <td>{runResults?.date_started?.split(".")[0]}</td>
-                  <td>{runResults.status === "SUCCESS" ? (Math.floor(runResults.duration / 60) + "m " + (runResults.duration % 60).toFixed(0) + "s") : runResults.status}</td>
+                  <td>
+                    {runResults.status === "SUCCESS"
+                      ? Math.floor(runResults.duration / 60) +
+                        "m " +
+                        (runResults.duration % 60).toFixed(0) +
+                        "s"
+                      : runResults.status}
+                  </td>
                 </tr>
               ))}
           </tbody>

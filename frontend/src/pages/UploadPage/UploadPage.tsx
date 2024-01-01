@@ -5,6 +5,7 @@ import { STATUS_COLORMAP, STATUS_UPLOAD } from "../../constants";
 import StartRunForm from "../../components/StartRunForm/StartRunForm";
 import "./styles.css";
 import Pagniation from "../../components/Pagination/Pagniation";
+import { PuffLoader } from "react-spinners";
 
 const fileTypes = ["fasta", "fa"];
 const itemsPerPage = 10;
@@ -38,6 +39,7 @@ export default function UploadPage() {
   const handleRemoveFile = () => {
     setFile(null);
     setUploadedStatus(null);
+    setLoading(false);
   };
 
   return (
@@ -59,13 +61,14 @@ export default function UploadPage() {
             x{" "}
           </button>
         )}
-        <p>{file ? `File name: ${file?.name}` : "no file uploaded yet"}</p>
+        <p style={{ marginRight: "1rem" }}>
+          {file ? `File name: ${file?.name}` : "no file uploaded yet"}
+        </p>
+        <PuffLoader color={"#36D7B7"} loading={loading} size={20} />
       </div>
       <button disabled={!file} onClick={handleSubmit} hidden={uploadedStatus}>
         Submit
       </button>
-
-      {loading && <p>Uploading...</p>}
 
       {uploadedStatus?.protein_status?.length && (
         <div>

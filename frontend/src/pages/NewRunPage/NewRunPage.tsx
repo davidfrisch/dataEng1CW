@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import api from "../../api";
 import { SPARK_URL } from "../../constants";
 import { Link } from "react-router-dom";
 import "./styles.css";
+import { SyncLoader } from "react-spinners";
 const fileTypes = ["txt"];
 
 export default function NewRunPage() {
@@ -11,6 +12,7 @@ export default function NewRunPage() {
   const [idsStatus, setIdsStatus] = useState<any>(null);
   const [nameOfRun, setNameOfRun] = useState<string>("");
   const [isRunStarted, setIsRunStarted] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleReset = () => {
     setFile(null);
@@ -22,29 +24,45 @@ export default function NewRunPage() {
   const handleChange = (file: any) => {
     // each line of the file is an id
     setFile(file);
+
     const reader = new FileReader();
     reader.onload = async (e) => {
-      if(!e.target) return;
+      if (!e.target) return;
 
       const text = e.target.result;
       if (typeof text !== "string") {
         return;
       }
       const ids = text.split("\n");
-      const isIdInDB = await api.proteins.getProteins(ids);
-      setIdsStatus(isIdInDB);
+      try {
+        const isIdInDB = await api.proteins.getProteins(ids);
+        setIdsStatus(isIdInDB);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     reader.readAsText(file);
   };
 
   const handleStartRun = async () => {
     const ids = idsStatus.foundIds;
-    const res = await api.runs.startRun({ ids, process_name: nameOfRun.trim() });
+    const res = await api.runs.startRun({
+      ids,
+      process_name: nameOfRun.trim(),
+    });
     console.log(res);
     if (res.status === 200) {
       setIsRunStarted(true);
     }
   };
+
+  useEffect(() => {
+    if (file) {
+      setIsLoading(true);
+    }
+  }, [file]);
 
   return (
     <div>
@@ -61,7 +79,8 @@ export default function NewRunPage() {
       ) : (
         <div className="file-info">
           <button onClick={handleReset}>Reset</button>
-          <div style={{ marginLeft: "10px" }}>File name: {file.name}</div>
+          <div style={{ margin: "0 10px" }}>File name: {file.name}</div>
+          <SyncLoader color={"#36D7B7"} loading={isLoading} size={20} />
         </div>
       )}
 
@@ -86,7 +105,11 @@ export default function NewRunPage() {
               onChange={(e) => setNameOfRun(e.target.value)}
               value={nameOfRun}
             />
-            <button disabled={!idsStatus} onClick={handleStartRun} style={{marginLeft: "10px"}}>
+            <button
+              disabled={!idsStatus}
+              onClick={handleStartRun}
+              style={{ marginLeft: "10px" }}
+            >
               Start
             </button>
           </div>
