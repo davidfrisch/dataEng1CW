@@ -83,6 +83,11 @@ echo "S4PRED_PATH=$S4PRED_PATH" >> $DIRECTORY/../.env.staging
 echo "SPARK_MASTER_URL=$SPARK_MASTER_URL" >> $DIRECTORY/../.env.staging
 echo "SHARE_DIR=$DOCKER_SHARE_DIR" >> $DIRECTORY/../.env.staging
 
+# For database
+echo "POSTGRES_USER=$DATABASE_USER" > $DIRECTORY/../database/.env.staging
+echo "POSTGRES_PASSWORD=$DATABASE_PASS" >> $DIRECTORY/../database/.env.staging
+echo "POSTGRES_DB=$DATABASE_NAME" >> $DIRECTORY/../database/.env.staging
+
 # For backend
 echo "DATABASE_URL=$DOCKER_DATABASE_URL" > $DIRECTORY/../backend/.env.staging
 echo "SHARE_DIR=$DOCKER_SHARE_DIR" >> $DIRECTORY/../backend/.env.staging
