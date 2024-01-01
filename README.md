@@ -9,6 +9,6 @@ The coursework is to predict possible 3D structures of proteins in the Human Gen
 - Have a GitHub Personal Access Token (PAT) given in the zip folder of the coursework submission.
 
 ## Guides
-To read the report of the coursework, please visit [DataEng_CW.pdf](DataEng_CW.pdf).
-To read the setup guide, please visit [setup_guide.md](setup_guide.md).
-To read the startup guide, please visit [startup_guide.md](startup_guide.md).
+- To read the report of the coursework, please visit [DataEng_CW.pdf](DataEng_CW.pdf).
+- To read the setup guide, please visit [setup_guide.md](setup_guide.md).
+- To read the startup guide, please visit [startup_guide.md](startup_guide.md).
