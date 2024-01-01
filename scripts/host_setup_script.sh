@@ -4,11 +4,17 @@ DIRECTORY=$(dirname $0)
 
 SECRET_KEY_FILE=""
 GIT_TOKEN=""
+DATABASE_NAME=proteomics
+DATABASE_USER=""
+DATABASE_PASS=""
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -s|--secret-key-file) SECRET_KEY_FILE="$2"; shift ;;
         -t|--git-token) GIT_TOKEN="$2"; shift ;;
+        -db|--db-name) DATABASE_NAME="$2"; shift ;;
+        -du|--db-user) DATABASE_USER="$2"; shift ;;
+        -dp|--db-pass) DATABASE_PASS="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
     shift
@@ -27,6 +33,16 @@ fi
 
 if [[ -z "$GIT_TOKEN" ]]; then
     echo "ERROR: git token not specified!, -t|--git-token"
+    exit 1
+fi
+
+if [[ -z "$DATABASE_USER" ]]; then
+    echo "ERROR: database user not specified!, -du|--db-user"
+    exit 1
+fi
+
+if [[ -z "$DATABASE_PASS" ]]; then
+    echo "ERROR: database password not specified!, -dp|--db-pass"
     exit 1
 fi
 
@@ -52,6 +68,9 @@ ssh_private_key: $SECRET_KEY_FILE
 git_token: $GIT_TOKEN
 spark_user: ec2-user
 spark_group: ec2-user
+database_name: $DATABASE_NAME
+database_user: $DATABASE_USER
+database_pass: $DATABASE_PASS
 " > $DIRECTORY/../ansible/custom_vars.yml
 
 
@@ -75,6 +94,6 @@ ssh-add $SECRET_KEY_FILE
 # take the next line of [client] from the inventory file
 BACKEND_ADDRESS=$(awk '/\[client\]/{getline; print}' $DIRECTORY/../ansible/inventory.ini | cut -d' ' -f1)
 
-echo "BACKEND_URL=http://$BACKEND_ADDRESS/api" > $DIRECTORY/../python_client/.env
+echo "BACKEND_URL=http://$BACKEND_ADDRESS/api" > $DIRECTORY/../client_python/.env
 
 echo "Finished installing host dependencies."

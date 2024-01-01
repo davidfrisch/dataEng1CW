@@ -19,8 +19,8 @@ FLASK_URL=http://127.0.0.1:5000
 # USER SPECIFIC VARIABLES
 HOSTNAME=""
 DATABASE_NAME=proteomics
-DATABASE_USER=postgres
-DATABASE_PASS=postgres
+DATABASE_USER=""
+DATABASE_PASS=""
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -35,6 +35,16 @@ done
 
 if [[ -z "$HOSTNAME" ]]; then
     echo "ERROR: hostname not specified!, use -h or --hostname"
+    exit 1
+fi
+
+if [[ -z "$DATABASE_USER" ]]; then
+    echo "ERROR: database user not specified!, -du|--db-user"
+    exit 1
+fi
+
+if [[ -z "$DATABASE_PASS" ]]; then
+    echo "ERROR: database password not specified!, -dp|--db-pass"
     exit 1
 fi
 

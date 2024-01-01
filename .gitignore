@@ -16,3 +16,4 @@ build
 *.fasta
 *.fa
 data/ids
+custom_vars.yml

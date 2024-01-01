@@ -45,7 +45,11 @@ Run the following commands to set up the hosts:
 
 ```bash
 sudo yum update -y
-./scripts/host_setup_script.sh -s <my_private_key> -t <git_token>
+./scripts/host_setup_script.sh 
+-s <my_private_key> \
+-t <git_token> \
+--db-user <db_user> \
+--db-pass <db_pass>
 ```
 
 This script creates the file `ansible/custom_vars.yml` with your custom variables.
