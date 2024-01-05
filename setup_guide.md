@@ -11,15 +11,7 @@ cd dataEng1CW/
 
 ## SSH Configuration
 
-Ensure that the necessary SSH keys are set up on your host machine:
-
-- `<my_private_key>`: Ansible uses this key for SSH access to the VMs.
-- `<my_public_key>`: This key is used to send public keys to the clusters.
-
-Both keys must be located in the `~/.ssh` folder of the host.
-
-Make sure the client VM can SSH to each node.
-
+Make sure that the public key is included in the authorized_keys file corresponding to the private key that will be used to connect to the VMs.
 
 ## Inventory Configuration
 
