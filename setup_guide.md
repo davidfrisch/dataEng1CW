@@ -11,7 +11,8 @@ cd dataEng1CW/
 
 ## SSH Configuration
 
-Make sure that the public key is included in the authorized_keys file corresponding to the private key that will be used to connect to the VMs.
+Ensure that the public key is added to the 'authorized_keys' file on each VM, corresponding to the private key intended for ssh connection.
+
 
 ## Inventory Configuration
 
@@ -36,7 +37,6 @@ echo "\
 Run the following commands to set up the hosts:
 
 ```bash
-sudo yum update -y
 ./scripts/host_setup_script.sh 
 -s <my_private_key> \
 -t <git_token> \
@@ -44,7 +44,9 @@ sudo yum update -y
 --db-pass <db_pass>
 ```
 
-This script creates the file `ansible/custom_vars.yml` with your custom variables.
+If it fails because the ansible ping fails, fix the issue and run the script again.
+
+This script creates the file `ansible/custom_vars.yml`, install ansible and test the connection to the VMs.
 
 ## Dependencies Installation
 

@@ -7,6 +7,14 @@
   include_tasks: tasks/download_pdb70.yml
   when: not pdb70_installation.stat.exists
 
+- name: Clean cache
+  become: true
+  shell: sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches
+
 - name: Send pdb70 to clusters
   include_tasks: tasks/send_pdb70_to_clusters.yml
   when: pdb70_installation.stat.exists
+
+- name: Clean cache
+  become: true
+  shell: sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches

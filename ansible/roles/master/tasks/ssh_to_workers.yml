@@ -7,13 +7,6 @@
     group: "{{ spark_group }}"
     mode: 0600
 
-- name: Give public key to master
-  copy:
-    src: "{{ ssh_private_key }}.pub"
-    dest: "{{ ssh_private_key }}.pub"
-    owner: "{{ spark_user }}"
-    group: "{{ spark_group }}"
-    mode: 0600
 
 - name: wake up ssh-agent and add private_key
   shell: |

@@ -96,4 +96,8 @@ BACKEND_ADDRESS=$(awk '/\[client\]/{getline; print}' $DIRECTORY/../ansible/inven
 
 echo "BACKEND_URL=http://$BACKEND_ADDRESS/api" > $DIRECTORY/../client_python/.env
 
+ansible-playbook -i $DIRECTORY/../ansible/inventory.ini $DIRECTORY/../ansible/ping_all.yml
+
 echo "Finished installing host dependencies."
+echo "You can now run the following command to start the installation of the Cloud environment (suggest to use tmux):"
+echo "ansible-playbook -i $DIRECTORY/../ansible/inventory.ini $DIRECTORY/../ansible/main_playbook.yml"
