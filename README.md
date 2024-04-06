@@ -12,6 +12,3 @@ The coursework is to predict possible 3D structures of proteins in the Human Gen
 - To read the report of the coursework, please visit [DataEng_CW.pdf](DataEng_CW.pdf).
 - To read the setup guide, please visit [setup_guide.md](setup_guide.md).
 - To read the startup guide, please visit [startup_guide.md](startup_guide.md).
-
-## Example
-- To see an example of the platform, please visit [http://ec2-13-40-164-5.eu-west-2.compute.amazonaws.com](http://ec2-13-40-164-5.eu-west-2.compute.amazonaws.com).
